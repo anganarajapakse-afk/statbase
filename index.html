@@ -1,0 +1,1524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>StatBase – Statistics for Everyone</title>
+<meta name="theme-color" content="#3d5a99"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<style>
+:root{--primary:#3d5a99;--primary-light:#c5d0ee;--primary-dim:#a0b0dc;--secondary:#1e6b8c;--secondary-container:#b8e0f0;--tertiary:#5c4d9e;--tertiary-container:#c8c0f0;--surface:#f6f8fc;--surface-low:#eef1f8;--surface-container:#e4e8f4;--surface-high:#d8ddf0;--surface-highest:#ccd2eb;--surface-white:#ffffff;--on-surface:#191c28;--on-surface-variant:#424660;--outline:#737899;--outline-variant:#c0c4dc;--error:#ba1a1a;--error-container:#ffdad6;--green:#2e7d32;--green-light:#e8f5e9;--orange:#e65100;--orange-light:#fff3e0;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',sans-serif;background:var(--surface);color:var(--on-surface);min-height:100dvh;overflow-x:hidden;}
+h1,h2,h3,h4{font-family:'Manrope',sans-serif;}
+.material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:24px;vertical-align:middle;}
+.fill-icon{font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24;}
+.screen{display:none;flex-direction:column;min-height:100dvh;padding-bottom:90px;animation:fadeIn 0.3s ease;}
+.screen.active{display:flex;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.topbar{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:rgba(246,248,252,0.92);backdrop-filter:blur(16px);box-shadow:0 4px 24px rgba(25,28,40,0.08);}
+.topbar-logo{font-family:'Manrope',sans-serif;font-weight:800;color:var(--primary);font-style:italic;font-size:18px;}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;display:flex;justify-content:space-around;align-items:center;padding:10px 8px 20px;background:rgba(246,248,252,0.95);backdrop-filter:blur(16px);border-top:1px solid rgba(192,196,220,0.3);}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:6px 10px;border-radius:12px;transition:all 0.2s;color:#5a6080;border:none;background:none;}
+.nav-item span.label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;}
+.nav-item.active{background:var(--primary);color:white;}
+.main{padding:80px 16px 20px;flex:1;max-width:700px;margin:0 auto;width:100%;}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 20px;border-radius:12px;font-family:'Manrope';font-weight:700;font-size:14px;cursor:pointer;border:none;transition:all 0.2s;}
+.btn-primary{background:var(--primary);color:white;box-shadow:0 4px 16px rgba(61,90,153,0.3);}
+.btn-primary:hover{filter:brightness(1.1);transform:translateY(-1px);}
+.card{background:var(--surface-white);border-radius:16px;padding:18px;box-shadow:0 4px 20px rgba(25,28,40,0.06);}
+.chip{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:999px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;}
+
+/* HOME */
+.hero-banner{background:linear-gradient(135deg,var(--primary) 0%,var(--tertiary) 100%);border-radius:20px;padding:24px;margin-bottom:20px;color:white;}
+.hero-banner h1{font-size:26px;font-weight:800;margin-bottom:6px;line-height:1.2;}
+.hero-banner p{font-size:13px;opacity:0.9;line-height:1.6;}
+.feature-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;}
+.feature-tile{background:var(--surface-white);border-radius:14px;padding:14px;cursor:pointer;transition:all 0.2s;box-shadow:0 2px 12px rgba(25,28,40,0.05);border-top:3px solid;}
+.feature-tile:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(25,28,40,0.1);}
+.feature-tile h3{font-size:13px;font-weight:700;margin:8px 0 4px;}
+.feature-tile p{font-size:11px;color:var(--on-surface-variant);line-height:1.4;}
+.topic-row{background:var(--surface-white);border-radius:14px;padding:14px 16px;margin-bottom:10px;cursor:pointer;display:flex;align-items:center;gap:14px;box-shadow:0 2px 10px rgba(25,28,40,0.04);transition:all 0.2s;border-left:4px solid;}
+.topic-row:hover{transform:translateX(3px);}
+.topic-row .icon-circle{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.topic-row h3{font-size:14px;font-weight:700;margin-bottom:2px;}
+.topic-row p{font-size:11px;color:var(--on-surface-variant);}
+.level-badge{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;padding:2px 8px;border-radius:4px;}
+
+/* TOPIC DETAIL */
+.topic-hero-bar{border-radius:16px;padding:20px;margin-bottom:20px;color:white;}
+.topic-hero-bar h2{font-size:26px;font-weight:800;margin-bottom:6px;}
+.topic-hero-bar p{font-size:13px;opacity:0.9;line-height:1.6;}
+.visual-box{background:var(--surface-white);border-radius:16px;padding:18px;margin-bottom:16px;box-shadow:0 4px 16px rgba(25,28,40,0.06);}
+.visual-box h4{font-size:13px;font-weight:700;color:var(--primary);margin-bottom:14px;display:flex;align-items:center;gap:6px;text-transform:uppercase;letter-spacing:0.08em;}
+.example-box{background:var(--orange-light);border-radius:14px;padding:16px;margin-bottom:14px;border-left:4px solid var(--orange);}
+.example-box .ex-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--orange);margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.example-box p{font-size:13px;color:#333;line-height:1.7;}
+.tip-box{background:var(--green-light);border-radius:14px;padding:16px;margin-bottom:14px;border-left:4px solid var(--green);}
+.tip-box .tip-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--green);margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.tip-box p{font-size:13px;color:#333;line-height:1.7;}
+.def-row{display:flex;gap:12px;align-items:flex-start;background:var(--surface-low);border-radius:12px;padding:14px;margin-bottom:10px;}
+.def-row .def-icon{width:36px;height:36px;border-radius:10px;background:var(--primary);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:white;}
+.def-row h4{font-size:13px;font-weight:700;margin-bottom:4px;}
+.def-row p{font-size:12px;color:var(--on-surface-variant);line-height:1.6;}
+.step-list{counter-reset:steps;}
+.step-item{display:flex;gap:12px;margin-bottom:12px;align-items:flex-start;}
+.step-num{width:28px;height:28px;border-radius:50%;background:var(--primary);color:white;font-family:'Manrope';font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;}
+.step-text{font-size:13px;color:var(--on-surface-variant);line-height:1.6;}
+.step-text strong{color:var(--on-surface);}
+.misconception-box{background:#fff8f8;border-radius:14px;padding:16px;margin-bottom:14px;border-left:4px solid var(--error);}
+.misconception-box .mc-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--error);margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.mc-row{display:flex;gap:10px;margin-bottom:8px;font-size:13px;align-items:flex-start;}
+.mc-wrong{color:var(--error);font-weight:700;flex-shrink:0;}
+.mc-right{color:var(--green);font-weight:700;flex-shrink:0;}
+
+/* FLASHCARDS */
+.filter-scroll{display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;margin-bottom:16px;}
+.filter-scroll::-webkit-scrollbar{display:none;}
+.filter-btn{flex-shrink:0;padding:6px 14px;border-radius:999px;font-size:12px;font-weight:600;border:1.5px solid var(--outline-variant);background:none;cursor:pointer;color:var(--on-surface-variant);transition:all 0.2s;white-space:nowrap;}
+.filter-btn.active{background:var(--primary);color:white;border-color:var(--primary);}
+.flashcard-scene{perspective:1000px;width:100%;aspect-ratio:4/3;position:relative;margin-bottom:18px;cursor:pointer;}
+.flashcard-inner{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform 0.6s cubic-bezier(0.4,0,0.2,1);}
+.flashcard-scene.flipped .flashcard-inner{transform:rotateY(180deg);}
+.flashcard-face{position:absolute;inset:0;backface-visibility:hidden;border-radius:20px;padding:24px;display:flex;flex-direction:column;box-shadow:0 12px 40px rgba(25,28,40,0.12);}
+.flashcard-front{background:var(--surface-white);justify-content:center;align-items:center;text-align:center;}
+.flashcard-back{background:var(--primary);color:white;transform:rotateY(180deg);justify-content:center;align-items:center;text-align:center;}
+.card-q{font-family:'Manrope';font-size:17px;font-weight:700;line-height:1.4;color:var(--on-surface);margin-bottom:10px;}
+.card-hint-txt{font-size:12px;color:var(--outline);font-style:italic;}
+.card-tap{position:absolute;bottom:16px;font-size:11px;color:var(--outline-variant);display:flex;align-items:center;gap:4px;}
+.card-a{font-family:'Manrope';font-size:16px;font-weight:700;line-height:1.5;}
+.card-a em{font-style:normal;opacity:0.8;font-size:13px;font-weight:400;display:block;margin-top:8px;}
+.fb-btns{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+.fb-btn{display:flex;align-items:center;gap:10px;padding:14px 16px;border-radius:14px;border:none;cursor:pointer;transition:all 0.2s;font-family:'Manrope';}
+.fb-btn.wrong{background:var(--surface-low);color:var(--error);}
+.fb-btn.right{background:var(--secondary-container);color:var(--secondary);}
+.fb-btn .fbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;opacity:0.6;}
+.fb-btn .fbt{font-size:14px;font-weight:800;}
+
+/* GLOSSARY */
+.g-search{position:relative;margin-bottom:16px;}
+.g-search input{width:100%;background:var(--surface-low);border:none;border-bottom:2px solid transparent;height:48px;padding:0 16px 0 44px;border-radius:12px;font-size:14px;color:var(--on-surface);outline:none;transition:border-color 0.2s;}
+.g-search input:focus{border-bottom-color:var(--primary);background:var(--surface-white);}
+.g-search .si{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--outline);}
+.g-letter{font-size:20px;font-weight:800;color:var(--primary);margin:18px 0 8px;padding-bottom:4px;border-bottom:2px solid var(--primary-light);}
+.g-item{background:var(--surface-white);border-radius:12px;padding:14px;margin-bottom:8px;box-shadow:0 2px 8px rgba(25,28,40,0.04);border-left:3px solid var(--primary-light);}
+.g-item h4{font-size:13px;font-weight:700;margin-bottom:4px;}
+.g-item p{font-size:12px;color:var(--on-surface-variant);line-height:1.6;}
+.g-tag{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;padding:2px 8px;border-radius:4px;display:inline-block;margin-bottom:5px;}
+
+/* FORMULA */
+.formula-card{background:var(--surface-white);border-radius:14px;padding:16px;margin-bottom:12px;box-shadow:0 2px 12px rgba(25,28,40,0.05);border-left:3px solid var(--primary);}
+.formula-card h4{font-size:14px;font-weight:700;margin-bottom:8px;}
+.formula{font-family:'Manrope';font-size:18px;font-weight:800;color:var(--primary);background:var(--surface-low);border-radius:10px;padding:12px 16px;margin:10px 0;text-align:center;}
+.formula-card p{font-size:12px;color:var(--on-surface-variant);line-height:1.6;}
+.vars span{display:inline-block;background:var(--surface-container);padding:2px 8px;border-radius:6px;margin:2px 3px 2px 0;font-size:11px;font-weight:600;}
+
+/* PRACTICE */
+.prob-card{background:var(--surface-white);border-radius:16px;padding:18px;margin-bottom:14px;box-shadow:0 4px 16px rgba(25,28,40,0.05);}
+.prob-card .lvl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;padding:3px 10px;border-radius:999px;display:inline-block;margin-bottom:8px;}
+.lvl-b{background:rgba(61,90,153,0.1);color:var(--primary);}
+.lvl-i{background:rgba(30,107,140,0.12);color:var(--secondary);}
+.lvl-a{background:rgba(92,77,158,0.12);color:var(--tertiary);}
+.prob-q{font-size:14px;color:var(--on-surface-variant);line-height:1.7;padding:14px;background:var(--surface-low);border-radius:10px;margin-bottom:12px;}
+.sol-toggle{background:none;border:1.5px solid var(--primary);color:var(--primary);padding:10px 16px;border-radius:10px;font-family:'Manrope';font-weight:700;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:8px;transition:all 0.2s;}
+.sol-toggle:hover{background:var(--primary);color:white;}
+.sol-box{display:none;margin-top:12px;background:rgba(61,90,153,0.05);border-radius:12px;padding:16px;border-left:3px solid var(--primary);}
+.sol-box.open{display:block;}
+.sol-answer{font-size:18px;font-weight:800;color:var(--primary);margin-top:10px;}
+
+/* SVG visuals */
+svg text{font-family:'Manrope',sans-serif;}
+svg{overflow:visible;}
+.visual-box svg{display:block;margin:0 auto;}
+.interactive-slider{width:100%;margin:10px 0;}
+input[type=range]{width:100%;accent-color:var(--primary);}
+
+@media(min-width:600px){.main{padding:80px 32px 24px;}.feature-grid{grid-template-columns:1fr 1fr 1fr;}}
+</style>
+</head>
+<body>
+
+<!-- ══════════ HOME ══════════ -->
+<div class="screen active" id="screen-home">
+  <header class="topbar">
+    <span class="topbar-logo">StatBase</span>
+    <span style="font-size:11px;font-weight:700;color:var(--primary);background:var(--surface-low);padding:4px 10px;border-radius:8px">FREE</span>
+  </header>
+  <div class="main">
+    <div class="hero-banner">
+      <h1>Statistics,<br>Simply Explained 📊</h1>
+      <p>No maths degree needed. Learn with pictures, real examples and plain English — from zero to confident.</p>
+    </div>
+
+    <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--outline);margin-bottom:10px">🚀 Start Here</div>
+    <div class="topic-row" style="border-color:#f59e0b;margin-bottom:16px" onclick="goToTopic('intro')">
+      <div class="icon-circle" style="background:#fff8e1"><span style="font-size:22px">👋</span></div>
+      <div>
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#f59e0b;margin-bottom:2px">Absolute Beginner</div>
+        <h3>What is Statistics?</h3>
+        <p>Why it matters & your learning roadmap</p>
+      </div>
+    </div>
+
+    <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--outline);margin-bottom:10px">📚 Topics</div>
+    <div class="feature-grid" style="margin-bottom:20px">
+      <div class="feature-tile" style="border-color:var(--primary)" onclick="goToTopic('descriptive')">
+        <div style="font-size:24px">📊</div>
+        <h3>Mean, Median & Mode</h3>
+        <p>Describing data in one number</p>
+        <div class="level-badge" style="background:rgba(61,90,153,0.1);color:var(--primary);margin-top:8px">Beginner</div>
+      </div>
+      <div class="feature-tile" style="border-color:#e65100" onclick="goToTopic('spread')">
+        <div style="font-size:24px">📏</div>
+        <h3>Spread & Variation</h3>
+        <p>How spread out is your data?</p>
+        <div class="level-badge" style="background:rgba(230,81,0,0.1);color:#e65100;margin-top:8px">Beginner</div>
+      </div>
+      <div class="feature-tile" style="border-color:#1e6b8c" onclick="goToTopic('data-types')">
+        <div style="font-size:24px">🗂️</div>
+        <h3>Types of Data</h3>
+        <p>What kind of data do you have?</p>
+        <div class="level-badge" style="background:rgba(30,107,140,0.1);color:#1e6b8c;margin-top:8px">Beginner</div>
+      </div>
+      <div class="feature-tile" style="border-color:#2e7d32" onclick="goToTopic('probability')">
+        <div style="font-size:24px">🎲</div>
+        <h3>Probability</h3>
+        <p>Measuring chance & uncertainty</p>
+        <div class="level-badge" style="background:rgba(46,125,50,0.1);color:#2e7d32;margin-top:8px">Intermediate</div>
+      </div>
+      <div class="feature-tile" style="border-color:#5c4d9e" onclick="goToTopic('distributions')">
+        <div style="font-size:24px">🔔</div>
+        <h3>The Bell Curve</h3>
+        <p>The most important shape in stats</p>
+        <div class="level-badge" style="background:rgba(92,77,158,0.1);color:#5c4d9e;margin-top:8px">Intermediate</div>
+      </div>
+      <div class="feature-tile" style="border-color:#b91c1c" onclick="goToTopic('hypothesis')">
+        <div style="font-size:24px">🔬</div>
+        <h3>Hypothesis Testing</h3>
+        <p>Proving things with data</p>
+        <div class="level-badge" style="background:rgba(185,28,28,0.1);color:#b91c1c;margin-top:8px">Advanced</div>
+      </div>
+    </div>
+
+    <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--outline);margin-bottom:10px">🧪 More Topics</div>
+    <div class="topic-row" style="border-color:var(--secondary)" onclick="goToTopic('correlation')">
+      <div class="icon-circle" style="background:var(--secondary-container)"><span style="font-size:20px">📉</span></div>
+      <div><h3>Correlation & Regression</h3><p>Are two things related?</p></div>
+    </div>
+    <div class="topic-row" style="border-color:var(--tertiary)" onclick="goToTopic('confidence')">
+      <div class="icon-circle" style="background:var(--tertiary-container)"><span style="font-size:20px">🎯</span></div>
+      <div><h3>Confidence Intervals</h3><p>How certain are your estimates?</p></div>
+    </div>
+  </div>
+  <nav class="bottom-nav">
+    <button class="nav-item active" onclick="goTo('screen-home')"><span class="material-symbols-outlined fill-icon">home</span><span class="label">Home</span></button>
+    <button class="nav-item" onclick="goTo('screen-flashcards')"><span class="material-symbols-outlined">style</span><span class="label">Cards</span></button>
+    <button class="nav-item" onclick="goTo('screen-formulas')"><span class="material-symbols-outlined">calculate</span><span class="label">Formulas</span></button>
+    <button class="nav-item" onclick="goTo('screen-practice')"><span class="material-symbols-outlined">edit_note</span><span class="label">Practice</span></button>
+    <button class="nav-item" onclick="goTo('screen-glossary')"><span class="material-symbols-outlined">menu_book</span><span class="label">Glossary</span></button>
+  </nav>
+</div>
+
+<!-- ══════════ TOPIC DETAIL ══════════ -->
+<div class="screen" id="screen-topic">
+  <header class="topbar">
+    <button style="background:none;border:none;cursor:pointer;color:var(--primary);display:flex;align-items:center;gap:6px;font-family:'Manrope';font-weight:700;font-size:14px" onclick="goTo('screen-home')">
+      <span class="material-symbols-outlined">arrow_back</span> Topics
+    </button>
+    <span class="topbar-logo">StatBase</span>
+  </header>
+  <div class="main" id="topic-content"></div>
+  <nav class="bottom-nav">
+    <button class="nav-item" onclick="goTo('screen-home')"><span class="material-symbols-outlined">home</span><span class="label">Home</span></button>
+    <button class="nav-item" onclick="goTo('screen-flashcards')"><span class="material-symbols-outlined">style</span><span class="label">Cards</span></button>
+    <button class="nav-item" onclick="goTo('screen-formulas')"><span class="material-symbols-outlined">calculate</span><span class="label">Formulas</span></button>
+    <button class="nav-item" onclick="goTo('screen-practice')"><span class="material-symbols-outlined">edit_note</span><span class="label">Practice</span></button>
+    <button class="nav-item" onclick="goTo('screen-glossary')"><span class="material-symbols-outlined">menu_book</span><span class="label">Glossary</span></button>
+  </nav>
+</div>
+
+<!-- ══════════ FLASHCARDS ══════════ -->
+<div class="screen" id="screen-flashcards">
+  <header class="topbar">
+    <button style="background:none;border:none;cursor:pointer;color:var(--primary)" onclick="goTo('screen-home')"><span class="material-symbols-outlined">close</span></button>
+    <span class="topbar-logo">Flashcards</span>
+    <span style="font-size:12px;font-weight:700;color:var(--primary)" id="card-counter">1/60</span>
+  </header>
+  <div class="main">
+    <div style="background:var(--surface-container);border-radius:999px;height:6px;margin-bottom:16px;overflow:hidden"><div id="flash-progress" style="height:100%;background:var(--primary);border-radius:999px;transition:width 0.5s;width:2%"></div></div>
+    <div class="filter-scroll">
+      <button class="filter-btn active" onclick="filterCards('all',this)">All</button>
+      <button class="filter-btn" onclick="filterCards('descriptive',this)">Mean/Median</button>
+      <button class="filter-btn" onclick="filterCards('spread',this)">Spread</button>
+      <button class="filter-btn" onclick="filterCards('data-types',this)">Data Types</button>
+      <button class="filter-btn" onclick="filterCards('probability',this)">Probability</button>
+      <button class="filter-btn" onclick="filterCards('distributions',this)">Distributions</button>
+      <button class="filter-btn" onclick="filterCards('hypothesis',this)">Hypothesis</button>
+      <button class="filter-btn" onclick="filterCards('correlation',this)">Correlation</button>
+      <button class="filter-btn" onclick="filterCards('confidence',this)">Confidence</button>
+    </div>
+    <div style="background:var(--surface-low);border-radius:14px;padding:12px 14px;margin-bottom:14px;display:flex;justify-content:space-between">
+      <div style="text-align:center"><div style="font-size:22px;font-weight:800;color:var(--green)" id="score-correct">0</div><div style="font-size:9px;font-weight:700;text-transform:uppercase;color:var(--outline)">Got It</div></div>
+      <div style="text-align:center"><div style="font-size:22px;font-weight:800;color:var(--error)" id="score-wrong">0</div><div style="font-size:9px;font-weight:700;text-transform:uppercase;color:var(--outline)">Review</div></div>
+      <div style="text-align:center"><div style="font-size:22px;font-weight:800" id="score-remaining">60</div><div style="font-size:9px;font-weight:700;text-transform:uppercase;color:var(--outline)">Left</div></div>
+      <div style="text-align:center"><div style="font-size:22px;font-weight:800" id="score-pct">0%</div><div style="font-size:9px;font-weight:700;text-transform:uppercase;color:var(--outline)">Score</div></div>
+    </div>
+    <div class="flashcard-scene" id="flashcard-scene" onclick="flipCard()">
+      <div class="flashcard-inner">
+        <div class="flashcard-face flashcard-front">
+          <div style="position:absolute;top:16px;right:16px;font-size:10px;color:var(--outline-variant);font-weight:700" id="card-cat">STAT</div>
+          <div style="font-size:28px;margin-bottom:12px" id="card-emoji">📊</div>
+          <div class="card-q" id="card-question">Loading…</div>
+          <div class="card-hint-txt" id="card-hint"></div>
+          <div class="card-tap"><span class="material-symbols-outlined" style="font-size:14px">touch_app</span> Tap to reveal answer</div>
+        </div>
+        <div class="flashcard-face flashcard-back">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.15em;opacity:0.7;margin-bottom:14px">Answer</div>
+          <div class="card-a" id="card-answer"></div>
+          <div style="margin-top:16px;font-size:11px;opacity:0.75;font-style:italic" id="card-tip"></div>
+        </div>
+      </div>
+    </div>
+    <div class="fb-btns">
+      <button class="fb-btn wrong" onclick="nextCard(false)">
+        <span class="material-symbols-outlined">replay</span>
+        <div><div class="fbl">Still learning</div><div class="fbt">Review Again</div></div>
+      </button>
+      <button class="fb-btn right" onclick="nextCard(true)">
+        <div><div class="fbl">I knew it!</div><div class="fbt">Got It ✓</div></div>
+        <span class="material-symbols-outlined">check_circle</span>
+      </button>
+    </div>
+    <div style="border-left:4px solid var(--surface-highest);padding-left:12px">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--primary);margin-bottom:4px">💡 Study Tip</div>
+      <p style="font-size:12px;color:var(--on-surface-variant);line-height:1.6;font-style:italic">Use SRS — review cards you find hard more often. Tap "Got It" only when you really know it!</p>
+    </div>
+  </div>
+  <nav class="bottom-nav">
+    <button class="nav-item" onclick="goTo('screen-home')"><span class="material-symbols-outlined">home</span><span class="label">Home</span></button>
+    <button class="nav-item active" onclick="goTo('screen-flashcards')"><span class="material-symbols-outlined fill-icon">style</span><span class="label">Cards</span></button>
+    <button class="nav-item" onclick="goTo('screen-formulas')"><span class="material-symbols-outlined">calculate</span><span class="label">Formulas</span></button>
+    <button class="nav-item" onclick="goTo('screen-practice')"><span class="material-symbols-outlined">edit_note</span><span class="label">Practice</span></button>
+    <button class="nav-item" onclick="goTo('screen-glossary')"><span class="material-symbols-outlined">menu_book</span><span class="label">Glossary</span></button>
+  </nav>
+</div>
+
+<!-- ══════════ FORMULAS ══════════ -->
+<div class="screen" id="screen-formulas">
+  <header class="topbar"><span class="topbar-logo">Formula Sheet</span></header>
+  <div class="main">
+    <div style="margin-bottom:20px">
+      <h2 style="font-size:30px;font-weight:800;color:var(--primary)">Formula <span style="font-style:italic;color:var(--primary-dim)">Sheet</span></h2>
+      <p style="font-size:13px;color:var(--on-surface-variant);margin-top:6px">Every key formula with plain-English explanations.</p>
+    </div>
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--outline);margin-bottom:12px">📊 Descriptive Statistics</div>
+    <div class="formula-card"><h4>Mean (Average)</h4><div class="formula">x̄ = Σx ÷ n</div><p>Add up all the values, then divide by how many there are.</p><div class="vars" style="margin-top:8px"><span>x̄ = mean</span><span>Σx = sum of all values</span><span>n = count</span></div></div>
+    <div class="formula-card"><h4>Sample Standard Deviation</h4><div class="formula">s = √[ Σ(x − x̄)² ÷ (n−1) ]</div><p>Measures how spread out values are from the mean. Use n−1 for samples.</p><div class="vars" style="margin-top:8px"><span>s = std dev</span><span>x̄ = mean</span><span>n = sample size</span></div></div>
+    <div class="formula-card"><h4>IQR (Interquartile Range)</h4><div class="formula">IQR = Q3 − Q1</div><p>The spread of the middle 50% of data. Not affected by outliers.</p></div>
+    <div class="formula-card"><h4>Z-Score</h4><div class="formula">z = (x − μ) ÷ σ</div><p>How many standard deviations above or below the mean a value is.</p><div class="vars" style="margin-top:8px"><span>x = value</span><span>μ = mean</span><span>σ = std dev</span></div></div>
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--outline);margin:20px 0 12px">🎲 Probability</div>
+    <div class="formula-card"><h4>Basic Probability</h4><div class="formula">P(A) = favourable ÷ total outcomes</div><p>The fraction of outcomes that are the event you want.</p></div>
+    <div class="formula-card"><h4>Complement Rule</h4><div class="formula">P(not A) = 1 − P(A)</div><p>Probability of something NOT happening = 1 minus it happening.</p></div>
+    <div class="formula-card"><h4>Addition Rule</h4><div class="formula">P(A or B) = P(A) + P(B) − P(A and B)</div><p>Subtract the overlap so you don't count it twice.</p></div>
+    <div class="formula-card"><h4>Conditional Probability</h4><div class="formula">P(A|B) = P(A and B) ÷ P(B)</div><p>Probability of A, given that B has already happened.</p></div>
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--outline);margin:20px 0 12px">🔬 Inferential Statistics</div>
+    <div class="formula-card"><h4>Standard Error</h4><div class="formula">SE = s ÷ √n</div><p>How much the sample mean is expected to vary from the true mean. Gets smaller with more data.</p></div>
+    <div class="formula-card"><h4>95% Confidence Interval</h4><div class="formula">CI = x̄ ± 1.96 × SE</div><p>The range likely to contain the true population mean 95% of the time.</p></div>
+    <div class="formula-card"><h4>Pearson Correlation (r)</h4><div class="formula">−1 ≤ r ≤ +1</div><p>+1 = perfect positive, −1 = perfect negative, 0 = no linear relationship.</p></div>
+  </div>
+  <nav class="bottom-nav">
+    <button class="nav-item" onclick="goTo('screen-home')"><span class="material-symbols-outlined">home</span><span class="label">Home</span></button>
+    <button class="nav-item" onclick="goTo('screen-flashcards')"><span class="material-symbols-outlined">style</span><span class="label">Cards</span></button>
+    <button class="nav-item active" onclick="goTo('screen-formulas')"><span class="material-symbols-outlined fill-icon">calculate</span><span class="label">Formulas</span></button>
+    <button class="nav-item" onclick="goTo('screen-practice')"><span class="material-symbols-outlined">edit_note</span><span class="label">Practice</span></button>
+    <button class="nav-item" onclick="goTo('screen-glossary')"><span class="material-symbols-outlined">menu_book</span><span class="label">Glossary</span></button>
+  </nav>
+</div>
+
+<!-- ══════════ PRACTICE ══════════ -->
+<div class="screen" id="screen-practice">
+  <header class="topbar"><span class="topbar-logo">Practice Problems</span></header>
+  <div class="main">
+    <div style="margin-bottom:20px">
+      <h2 style="font-size:30px;font-weight:800;color:var(--primary)">Practice <span style="font-style:italic;color:var(--primary-dim)">Problems</span></h2>
+      <p style="font-size:13px;color:var(--on-surface-variant);margin-top:6px">Try each problem yourself, then reveal the full worked solution.</p>
+    </div>
+    <div class="filter-scroll" style="margin-bottom:20px">
+      <button class="filter-btn active" onclick="filterProbs('all',this)">All</button>
+      <button class="filter-btn" onclick="filterProbs('beginner',this)">🟢 Beginner</button>
+      <button class="filter-btn" onclick="filterProbs('intermediate',this)">🟡 Intermediate</button>
+      <button class="filter-btn" onclick="filterProbs('advanced',this)">🔴 Advanced</button>
+    </div>
+    <div id="probs-container"></div>
+  </div>
+  <nav class="bottom-nav">
+    <button class="nav-item" onclick="goTo('screen-home')"><span class="material-symbols-outlined">home</span><span class="label">Home</span></button>
+    <button class="nav-item" onclick="goTo('screen-flashcards')"><span class="material-symbols-outlined">style</span><span class="label">Cards</span></button>
+    <button class="nav-item" onclick="goTo('screen-formulas')"><span class="material-symbols-outlined">calculate</span><span class="label">Formulas</span></button>
+    <button class="nav-item active" onclick="goTo('screen-practice')"><span class="material-symbols-outlined fill-icon">edit_note</span><span class="label">Practice</span></button>
+    <button class="nav-item" onclick="goTo('screen-glossary')"><span class="material-symbols-outlined">menu_book</span><span class="label">Glossary</span></button>
+  </nav>
+</div>
+
+<!-- ══════════ GLOSSARY ══════════ -->
+<div class="screen" id="screen-glossary">
+  <header class="topbar"><span class="topbar-logo">Glossary A–Z</span></header>
+  <div class="main">
+    <div style="margin-bottom:16px">
+      <h2 style="font-size:30px;font-weight:800;color:var(--primary)">Glossary</h2>
+      <p style="font-size:13px;color:var(--on-surface-variant);margin-top:6px">Every stats term, explained simply.</p>
+    </div>
+    <div class="g-search"><span class="material-symbols-outlined si">search</span><input type="text" id="g-input" placeholder="Search a term…" oninput="renderGlossary()"/></div>
+    <div id="g-container"></div>
+  </div>
+  <nav class="bottom-nav">
+    <button class="nav-item" onclick="goTo('screen-home')"><span class="material-symbols-outlined">home</span><span class="label">Home</span></button>
+    <button class="nav-item" onclick="goTo('screen-flashcards')"><span class="material-symbols-outlined">style</span><span class="label">Cards</span></button>
+    <button class="nav-item" onclick="goTo('screen-formulas')"><span class="material-symbols-outlined">calculate</span><span class="label">Formulas</span></button>
+    <button class="nav-item" onclick="goTo('screen-practice')"><span class="material-symbols-outlined">edit_note</span><span class="label">Practice</span></button>
+    <button class="nav-item active" onclick="goTo('screen-glossary')"><span class="material-symbols-outlined fill-icon">menu_book</span><span class="label">Glossary</span></button>
+  </nav>
+</div>
+
+<script>
+// ══════════ NAV ══════════
+function goTo(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const el=document.getElementById(id);
+  if(el){el.classList.add('active');window.scrollTo(0,0);}
+  if(id==='screen-practice')renderProbs();
+  if(id==='screen-glossary')renderGlossary();
+  if(id==='screen-flashcards'){updateScores();showCard();}
+}
+
+// ══════════ TOPIC CONTENT ══════════
+const topicData = {
+
+'intro': {
+  color:'linear-gradient(135deg,#f59e0b,#ef4444)',
+  emoji:'👋',
+  title:'What is Statistics?',
+  subtitle:'Statistics is the science of making sense of data. It is used everywhere — and you already use it without realising!',
+  html:`
+    <div class="visual-box">
+      <h4>📍 Where do we see statistics every day?</h4>
+      <svg viewBox="0 0 320 220" style="width:100%;border-radius:12px">
+        <rect width="320" height="220" fill="#f8faff" rx="12"/>
+        <text x="160" y="18" text-anchor="middle" font-size="13" font-weight="800" fill="#1e40af">Statistics is everywhere in real life!</text>
+        <!-- 4 tiles -->
+        <rect x="10" y="28" width="68" height="74" rx="12" fill="#dbeafe" stroke="#93c5fd" stroke-width="1.5"/>
+        <text x="44" y="58" text-anchor="middle" font-size="30">🌧️</text>
+        <text x="44" y="75" text-anchor="middle" font-size="12" font-weight="800" fill="#1e40af">Weather</text>
+        <text x="44" y="90" text-anchor="middle" font-size="11" fill="#3b82f6">70% rain</text>
+        <rect x="86" y="28" width="68" height="74" rx="12" fill="#dcfce7" stroke="#86efac" stroke-width="1.5"/>
+        <text x="120" y="58" text-anchor="middle" font-size="30">🏏</text>
+        <text x="120" y="75" text-anchor="middle" font-size="12" font-weight="800" fill="#166534">Sports</text>
+        <text x="120" y="90" text-anchor="middle" font-size="11" fill="#16a34a">Avg runs</text>
+        <rect x="162" y="28" width="68" height="74" rx="12" fill="#fce7f3" stroke="#f9a8d4" stroke-width="1.5"/>
+        <text x="196" y="58" text-anchor="middle" font-size="30">💊</text>
+        <text x="196" y="75" text-anchor="middle" font-size="12" font-weight="800" fill="#9d174d">Medicine</text>
+        <text x="196" y="90" text-anchor="middle" font-size="11" fill="#db2777">Drug trials</text>
+        <rect x="238" y="28" width="72" height="74" rx="12" fill="#fef3c7" stroke="#fde68a" stroke-width="1.5"/>
+        <text x="274" y="58" text-anchor="middle" font-size="30">📝</text>
+        <text x="274" y="75" text-anchor="middle" font-size="12" font-weight="800" fill="#92400e">Exams</text>
+        <text x="274" y="90" text-anchor="middle" font-size="11" fill="#b45309">Class avg</text>
+        <!-- Two branches header -->
+        <text x="160" y="122" text-anchor="middle" font-size="13" font-weight="800" fill="#3d5a99">TWO BRANCHES OF STATISTICS</text>
+        <!-- Descriptive panel -->
+        <rect x="10" y="132" width="142" height="78" rx="12" fill="#eff6ff" stroke="#3d5a99" stroke-width="2"/>
+        <text x="81" y="155" text-anchor="middle" font-size="14" font-weight="800" fill="#3d5a99">📋 Descriptive</text>
+        <text x="81" y="172" text-anchor="middle" font-size="12" fill="#475569">Summarises your</text>
+        <text x="81" y="187" text-anchor="middle" font-size="12" fill="#475569">existing data</text>
+        <text x="81" y="202" text-anchor="middle" font-size="11" fill="#94a3b8">"avg was 72 marks"</text>
+        <!-- Inferential panel -->
+        <rect x="162" y="132" width="148" height="78" rx="12" fill="#f5f3ff" stroke="#5c4d9e" stroke-width="2"/>
+        <text x="236" y="155" text-anchor="middle" font-size="14" font-weight="800" fill="#5c4d9e">🔬 Inferential</text>
+        <text x="236" y="172" text-anchor="middle" font-size="12" fill="#475569">Makes predictions</text>
+        <text x="236" y="187" text-anchor="middle" font-size="12" fill="#475569">about a population</text>
+        <text x="236" y="202" text-anchor="middle" font-size="11" fill="#94a3b8">"60% will pass"</text>
+      </svg>
+    </div>
+    <div class="example-box">
+      <div class="ex-label">🌍 Real Life Example</div>
+      <p>When a weather app says <strong>"70% chance of rain tomorrow"</strong> — that is probability, a core idea in statistics. When a cricket commentator says <strong>"this batsman averages 58 runs per innings"</strong> — that is descriptive statistics. Statistics is all around you!</p>
+    </div>
+    <div class="visual-box">
+      <h4>🗺️ Your Learning Roadmap</h4>
+      <svg viewBox="0 0 320 260" style="width:100%">
+        <rect width="320" height="260" fill="#f8faff" rx="12"/>
+        <text x="160" y="18" text-anchor="middle" font-size="13" font-weight="800" fill="#3d5a99">Your Learning Journey</text>
+        <defs><marker id="arr" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#94a3b8"/></marker></defs>
+        <!-- Step 1 -->
+        <rect x="10" y="28" width="145" height="52" rx="12" fill="#dbeafe" stroke="#93c5fd" stroke-width="2"/>
+        <text x="82" y="48" text-anchor="middle" font-size="13" font-weight="800" fill="#1e40af">① Descriptive Stats</text>
+        <text x="82" y="66" text-anchor="middle" font-size="12" fill="#3b82f6">Mean, median, spread</text>
+        <!-- Arrow 1→2 -->
+        <path d="M82 80 Q82 100 238 100" stroke="#94a3b8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+        <!-- Step 2 -->
+        <rect x="165" y="100" width="145" height="52" rx="12" fill="#dcfce7" stroke="#86efac" stroke-width="2"/>
+        <text x="237" y="120" text-anchor="middle" font-size="13" font-weight="800" fill="#166534">② Data Types</text>
+        <text x="237" y="138" text-anchor="middle" font-size="12" fill="#16a34a">Know your data</text>
+        <!-- Arrow 2→3 -->
+        <path d="M237 152 Q237 170 82 170" stroke="#94a3b8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+        <!-- Step 3 -->
+        <rect x="10" y="170" width="145" height="52" rx="12" fill="#fce7f3" stroke="#f9a8d4" stroke-width="2"/>
+        <text x="82" y="190" text-anchor="middle" font-size="13" font-weight="800" fill="#9d174d">③ Probability</text>
+        <text x="82" y="208" text-anchor="middle" font-size="12" fill="#db2777">Chance &amp; uncertainty</text>
+        <!-- Arrow 3→4 -->
+        <path d="M82 222 Q82 240 238 240" stroke="#94a3b8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+        <!-- Step 4 -->
+        <rect x="165" y="230" width="145" height="22" rx="10" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="2"/>
+        <text x="237" y="246" text-anchor="middle" font-size="13" font-weight="800" fill="#5c4d9e">④ Inference &amp; Hypothesis</text>
+      </svg>
+    </div>
+    <div class="tip-box">
+      <div class="tip-label">✅ Key Idea</div>
+      <p>A <strong>statistic</strong> describes a <em>sample</em> (e.g. average height of 200 students you measured). A <strong>parameter</strong> describes a <em>population</em> (e.g. true average height of all students in the country). We use statistics to estimate parameters!</p>
+    </div>`
+},
+
+'descriptive': {
+  color:'linear-gradient(135deg,#3d5a99,#1e6b8c)',
+  emoji:'📊',
+  title:'Mean, Median & Mode',
+  subtitle:'Three ways to describe the "middle" or "typical" value of a dataset. Each one tells a slightly different story.',
+  html:`
+    <div class="visual-box">
+      <h4>📊 What is the Mean?</h4>
+      <p style="font-size:13px;color:var(--on-surface-variant);margin-bottom:14px;line-height:1.7">The mean is the <strong>arithmetic average</strong>. Add up all values, divide by how many there are. It balances the data like a see-saw.</p>
+      <svg viewBox="0 0 320 145" style="width:100%">
+        <rect width="320" height="145" fill="#f8faff" rx="12"/>
+        <text x="160" y="20" text-anchor="middle" font-size="11" fill="#64748b">Add all values, then divide by how many</text>
+        <!-- Value boxes -->
+        <rect x="10" y="30" width="48" height="48" rx="10" fill="#dbeafe" stroke="#93c5fd" stroke-width="1.5"/>
+        <text x="34" y="61" text-anchor="middle" font-size="24" font-weight="800" fill="#1e40af">4</text>
+        <rect x="65" y="30" width="48" height="48" rx="10" fill="#dbeafe" stroke="#93c5fd" stroke-width="1.5"/>
+        <text x="89" y="61" text-anchor="middle" font-size="24" font-weight="800" fill="#1e40af">8</text>
+        <rect x="120" y="30" width="48" height="48" rx="10" fill="#dbeafe" stroke="#93c5fd" stroke-width="1.5"/>
+        <text x="144" y="61" text-anchor="middle" font-size="24" font-weight="800" fill="#1e40af">6</text>
+        <rect x="175" y="30" width="48" height="48" rx="10" fill="#dbeafe" stroke="#93c5fd" stroke-width="1.5"/>
+        <text x="199" y="61" text-anchor="middle" font-size="24" font-weight="800" fill="#1e40af">10</text>
+        <rect x="230" y="30" width="48" height="48" rx="10" fill="#dbeafe" stroke="#93c5fd" stroke-width="1.5"/>
+        <text x="254" y="61" text-anchor="middle" font-size="24" font-weight="800" fill="#1e40af">2</text>
+        <!-- Calculation -->
+        <text x="160" y="100" text-anchor="middle" font-size="12" fill="#475569">Sum: 4+8+6+10+2 = <tspan font-weight="800" fill="#3d5a99">30</tspan>   ÷ 5 = <tspan font-weight="800" fill="#3d5a99">Mean = 6</tspan></text>
+        <!-- See-saw -->
+        <line x1="25" y1="128" x2="295" y2="128" stroke="#cbd5e1" stroke-width="2"/>
+        <polygon points="160,114 150,128 170,128" fill="#3d5a99"/>
+        <text x="160" y="143" text-anchor="middle" font-size="11" font-weight="700" fill="#3d5a99">⬆ The mean is the balance point</text>
+      </svg>
+    </div>
+    <div class="example-box">
+      <div class="ex-label">🏏 Cricket Example</div>
+      <p>A batsman scores: <strong>45, 62, 18, 90, 35</strong> runs in 5 innings.<br><br>Mean = (45+62+18+90+35) ÷ 5 = 250 ÷ 5 = <strong>50 runs per innings</strong></p>
+    </div>
+    <div class="visual-box">
+      <h4>📍 What is the Median?</h4>
+      <p style="font-size:13px;color:var(--on-surface-variant);margin-bottom:14px;line-height:1.7">The <strong>middle value</strong> when data is sorted in order. Exactly half the values are above it and half below it.</p>
+      <svg viewBox="0 0 320 110" style="width:100%">
+        <rect width="320" height="110" fill="#f8faff" rx="12"/>
+        <text x="160" y="18" text-anchor="middle" font-size="11" fill="#64748b">Step 1: Sort the data in order</text>
+        <!-- Sorted value boxes -->
+        <rect x="10" y="26" width="50" height="50" rx="10" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="1.5"/>
+        <text x="35" y="57" text-anchor="middle" font-size="22" font-weight="800" fill="#94a3b8">18</text>
+        <rect x="68" y="26" width="50" height="50" rx="10" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="1.5"/>
+        <text x="93" y="57" text-anchor="middle" font-size="22" font-weight="800" fill="#94a3b8">35</text>
+        <!-- Middle highlighted -->
+        <rect x="126" y="22" width="58" height="58" rx="12" fill="#3d5a99"/>
+        <text x="155" y="47" text-anchor="middle" font-size="11" font-weight="700" fill="white">Median</text>
+        <text x="155" y="67" text-anchor="middle" font-size="22" font-weight="800" fill="white">45</text>
+        <rect x="192" y="26" width="50" height="50" rx="10" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="1.5"/>
+        <text x="217" y="57" text-anchor="middle" font-size="22" font-weight="800" fill="#94a3b8">62</text>
+        <rect x="250" y="26" width="50" height="50" rx="10" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="1.5"/>
+        <text x="275" y="57" text-anchor="middle" font-size="22" font-weight="800" fill="#94a3b8">90</text>
+        <!-- Labels -->
+        <text x="35" y="92" text-anchor="middle" font-size="10" fill="#94a3b8">lower</text>
+        <text x="155" y="97" text-anchor="middle" font-size="11" font-weight="700" fill="#3d5a99">⬆ middle value</text>
+        <text x="275" y="92" text-anchor="middle" font-size="10" fill="#94a3b8">upper</text>
+      </svg>
+    </div>
+    <div class="visual-box">
+      <h4>🔴 Why the Median Sometimes Wins</h4>
+      <p style="font-size:13px;color:var(--on-surface-variant);margin-bottom:14px;line-height:1.7">Imagine 9 employees earn <strong>Rs.30,000/month</strong> and 1 CEO earns <strong>Rs.500,000/month</strong>.</p>
+      <svg viewBox="0 0 320 180" style="width:100%">
+        <rect width="320" height="180" fill="#fff8f8" rx="12"/>
+        <text x="148" y="16" text-anchor="middle" font-size="11" font-weight="700" fill="#555">9 employees vs 1 CEO</text>
+        <!-- Employee bars — 9 short blue bars, narrower to leave room for labels -->
+        <rect x="10" y="76" width="18" height="38" rx="4" fill="#93c5fd"/>
+        <rect x="32" y="76" width="18" height="38" rx="4" fill="#93c5fd"/>
+        <rect x="54" y="76" width="18" height="38" rx="4" fill="#93c5fd"/>
+        <rect x="76" y="76" width="18" height="38" rx="4" fill="#93c5fd"/>
+        <rect x="98" y="76" width="18" height="38" rx="4" fill="#93c5fd"/>
+        <rect x="120" y="76" width="18" height="38" rx="4" fill="#93c5fd"/>
+        <rect x="142" y="76" width="18" height="38" rx="4" fill="#93c5fd"/>
+        <rect x="164" y="76" width="18" height="38" rx="4" fill="#93c5fd"/>
+        <rect x="186" y="76" width="18" height="38" rx="4" fill="#93c5fd"/>
+        <!-- CEO bar — tall red bar -->
+        <rect x="212" y="28" width="22" height="86" rx="4" fill="#fca5a5" stroke="#ef4444" stroke-width="1.5"/>
+        <!-- CEO label above bar -->
+        <text x="223" y="24" text-anchor="middle" font-size="10" font-weight="800" fill="#b91c1c">CEO!</text>
+        <!-- Mean dashed line -->
+        <line x1="8" y1="56" x2="240" y2="56" stroke="#ef4444" stroke-width="2" stroke-dasharray="5,3"/>
+        <!-- Mean label — right side, well clear of bars -->
+        <rect x="246" y="44" width="68" height="28" rx="6" fill="#fce7f3"/>
+        <text x="280" y="57" text-anchor="middle" font-size="11" font-weight="800" fill="#ef4444">Mean</text>
+        <text x="280" y="69" text-anchor="middle" font-size="10" fill="#ef4444">Rs. 77k</text>
+        <!-- Median solid line -->
+        <line x1="8" y1="78" x2="240" y2="78" stroke="#3d5a99" stroke-width="2.5"/>
+        <!-- Median label — right side, below mean label -->
+        <rect x="246" y="82" width="68" height="28" rx="6" fill="#dbeafe"/>
+        <text x="280" y="95" text-anchor="middle" font-size="11" font-weight="800" fill="#3d5a99">Median</text>
+        <text x="280" y="107" text-anchor="middle" font-size="10" fill="#3d5a99">Rs. 30k</text>
+        <!-- Caption -->
+        <text x="155" y="135" text-anchor="middle" font-size="12" font-weight="800" fill="#b91c1c">Mean is dragged up by the outlier — misleading!</text>
+        <text x="155" y="152" text-anchor="middle" font-size="12" fill="#3d5a99">Median stays at the real typical value ✓</text>
+      </svg>
+    </div>
+    <div class="visual-box">
+      <h4>🎯 Mode — Most Popular Value</h4>
+      <p style="font-size:13px;color:var(--on-surface-variant);margin-bottom:12px;line-height:1.7">The value that appears <strong>most often</strong>. Great for categories like shoe sizes or favourite colours.</p>
+      <svg viewBox="0 0 320 120" style="width:100%">
+        <rect width="320" height="120" fill="#f8faff" rx="12"/>
+        <text x="160" y="16" text-anchor="middle" font-size="11" fill="#64748b">Shoe sizes sold today: 5, 7, 7, 8, 7, 6, 9, 7, 5</text>
+        <!-- Ground line -->
+        <line x1="10" y1="92" x2="200" y2="92" stroke="#e2e8f0" stroke-width="1.5"/>
+        <!-- Size 5 → 2x -->
+        <rect x="18" y="62" width="28" height="30" rx="5" fill="#c7d2fe"/>
+        <text x="32" y="81" text-anchor="middle" font-size="13" font-weight="700" fill="#4338ca">5</text>
+        <text x="32" y="105" text-anchor="middle" font-size="11" fill="#6366f1">2×</text>
+        <!-- Size 6 → 1x -->
+        <rect x="56" y="75" width="28" height="17" rx="5" fill="#c7d2fe"/>
+        <text x="70" y="87" text-anchor="middle" font-size="13" font-weight="700" fill="#4338ca">6</text>
+        <text x="70" y="105" text-anchor="middle" font-size="11" fill="#6366f1">1×</text>
+        <!-- Size 7 → 4x  (MODE - tallest, highlighted) -->
+        <rect x="94" y="26" width="34" height="66" rx="6" fill="#3d5a99"/>
+        <text x="111" y="52" text-anchor="middle" font-size="13" font-weight="800" fill="white">7</text>
+        <text x="111" y="70" text-anchor="middle" font-size="18" font-weight="800" fill="white">4×</text>
+        <text x="111" y="108" text-anchor="middle" font-size="12" font-weight="800" fill="#3d5a99">MODE ⭐</text>
+        <!-- Size 8 → 2x -->
+        <rect x="140" y="62" width="28" height="30" rx="5" fill="#c7d2fe"/>
+        <text x="154" y="81" text-anchor="middle" font-size="13" font-weight="700" fill="#4338ca">8</text>
+        <text x="154" y="105" text-anchor="middle" font-size="11" fill="#6366f1">2×</text>
+        <!-- Size 9 → 1x -->
+        <rect x="178" y="75" width="28" height="17" rx="5" fill="#c7d2fe"/>
+        <text x="192" y="87" text-anchor="middle" font-size="13" font-weight="700" fill="#4338ca">9</text>
+        <text x="192" y="105" text-anchor="middle" font-size="11" fill="#6366f1">1×</text>
+        <!-- Result label -->
+        <text x="260" y="52" text-anchor="middle" font-size="14" font-weight="800" fill="#3d5a99">Mode = 7</text>
+        <text x="260" y="70" text-anchor="middle" font-size="11" fill="#64748b">Most popular</text>
+        <text x="260" y="85" text-anchor="middle" font-size="11" fill="#64748b">shoe size</text>
+      </svg>
+    </div>
+    <div class="tip-box">
+      <div class="tip-label">✅ When to Use Each</div>
+      <p>📊 <strong>Mean</strong> — when data is symmetric with no extreme values (e.g. heights of students)<br>📍 <strong>Median</strong> — when data is skewed or has outliers (e.g. house prices, salaries)<br>🎯 <strong>Mode</strong> — when data is categorical (e.g. most popular colour, most sold size)</p>
+    </div>`
+},
+
+'spread': {
+  color:'linear-gradient(135deg,#e65100,#f59e0b)',
+  emoji:'📏',
+  title:'Spread & Variation',
+  subtitle:'Two datasets can have the same mean but be very different! Spread tells us how much the data varies.',
+  html:`
+    <div class="visual-box">
+      <h4>📏 Why Does Spread Matter?</h4>
+      <p style="font-size:13px;color:var(--on-surface-variant);margin-bottom:14px;line-height:1.7">Both classes below have a mean score of <strong>70</strong>. But they are very different!</p>
+      <svg viewBox="0 0 320 190" style="width:100%">
+        <rect width="320" height="190" fill="#f8faff" rx="12"/>
+        <!-- Class A header -->
+        <rect x="10" y="10" width="300" height="24" rx="8" fill="#dbeafe"/>
+        <text x="160" y="26" text-anchor="middle" font-size="12" font-weight="800" fill="#1e40af">Class A — Consistent (Low Spread, SD ≈ 4)</text>
+        <!-- Class A bars - all similar heights -->
+        <rect x="22" y="58" width="32" height="28" rx="5" fill="#93c5fd"/>
+        <text x="38" y="75" text-anchor="middle" font-size="12" font-weight="700" fill="#1e40af">65</text>
+        <rect x="62" y="52" width="32" height="34" rx="5" fill="#93c5fd"/>
+        <text x="78" y="72" text-anchor="middle" font-size="12" font-weight="700" fill="#1e40af">68</text>
+        <rect x="102" y="44" width="32" height="42" rx="5" fill="#3d5a99"/>
+        <text x="118" y="68" text-anchor="middle" font-size="12" font-weight="700" fill="white">70</text>
+        <rect x="142" y="52" width="32" height="34" rx="5" fill="#93c5fd"/>
+        <text x="158" y="72" text-anchor="middle" font-size="12" font-weight="700" fill="#1e40af">72</text>
+        <rect x="182" y="56" width="32" height="30" rx="5" fill="#93c5fd"/>
+        <text x="198" y="74" text-anchor="middle" font-size="12" font-weight="700" fill="#1e40af">75</text>
+        <text x="240" y="60" font-size="12" font-weight="700" fill="#3d5a99">SD ≈ 4</text>
+        <text x="240" y="76" font-size="11" fill="#3d5a99">Close together ✓</text>
+        <!-- Class B header -->
+        <rect x="10" y="100" width="300" height="24" rx="8" fill="#fce7f3"/>
+        <text x="160" y="116" text-anchor="middle" font-size="12" font-weight="800" fill="#b91c1c">Class B — Inconsistent (High Spread, SD ≈ 28)</text>
+        <!-- Class B bars - very different heights -->
+        <rect x="22" y="158" width="32" height="18" rx="5" fill="#fca5a5"/>
+        <text x="38" y="172" text-anchor="middle" font-size="12" font-weight="700" fill="#b91c1c">30</text>
+        <rect x="62" y="148" width="32" height="28" rx="5" fill="#fca5a5"/>
+        <text x="78" y="166" text-anchor="middle" font-size="12" font-weight="700" fill="#b91c1c">45</text>
+        <rect x="102" y="138" width="32" height="38" rx="5" fill="#ef4444"/>
+        <text x="118" y="161" text-anchor="middle" font-size="12" font-weight="700" fill="white">70</text>
+        <rect x="142" y="126" width="32" height="50" rx="5" fill="#fca5a5"/>
+        <text x="158" y="155" text-anchor="middle" font-size="12" font-weight="700" fill="#b91c1c">90</text>
+        <rect x="182" y="116" width="32" height="60" rx="5" fill="#fca5a5"/>
+        <text x="198" y="150" text-anchor="middle" font-size="12" font-weight="700" fill="#b91c1c">105</text>
+        <text x="240" y="148" font-size="12" font-weight="700" fill="#ef4444">SD ≈ 28</text>
+        <text x="240" y="164" font-size="11" fill="#ef4444">Very different ✗</text>
+        <text x="160" y="184" text-anchor="middle" font-size="11" font-weight="700" fill="#475569">Both have mean = 70, but spread tells a very different story!</text>
+      </svg>
+    </div>
+    <div class="visual-box">
+      <h4>📐 Range — Simplest Measure</h4>
+      <svg viewBox="0 0 320 90" style="width:100%">
+        <rect width="320" height="90" fill="#fff8f0" rx="12"/>
+        <text x="160" y="18" text-anchor="middle" font-size="11" fill="#64748b">Daily temperatures: 24, 27, 22, 31, 28, 26, 29°C</text>
+        <!-- Horizontal number line -->
+        <line x1="30" y1="52" x2="290" y2="52" stroke="#e65100" stroke-width="2.5"/>
+        <!-- Min tick -->
+        <line x1="30" y1="42" x2="30" y2="62" stroke="#e65100" stroke-width="2.5"/>
+        <text x="30" y="38" text-anchor="middle" font-size="13" font-weight="800" fill="#e65100">22°</text>
+        <text x="30" y="76" text-anchor="middle" font-size="11" font-weight="700" fill="#e65100">Min</text>
+        <!-- Max tick -->
+        <line x1="290" y1="42" x2="290" y2="62" stroke="#e65100" stroke-width="2.5"/>
+        <text x="290" y="38" text-anchor="middle" font-size="13" font-weight="800" fill="#e65100">31°</text>
+        <text x="290" y="76" text-anchor="middle" font-size="11" font-weight="700" fill="#e65100">Max</text>
+        <!-- Range label in centre -->
+        <text x="160" y="48" text-anchor="middle" font-size="14" font-weight="800" fill="#e65100">Range = 31 − 22 = 9°C</text>
+        <text x="160" y="76" text-anchor="middle" font-size="11" fill="#92400e">← spread across this whole range →</text>
+      </svg>
+    </div>
+    <div class="visual-box">
+      <h4>📦 IQR — The Middle 50%</h4>
+      <p style="font-size:13px;color:var(--on-surface-variant);margin-bottom:12px;line-height:1.7">The <strong>Interquartile Range</strong> ignores the extremes and focuses on the middle 50% of data. Much more reliable than the range!</p>
+      <svg viewBox="0 0 320 120" style="width:100%">
+        <rect width="320" height="120" fill="#f8faff" rx="12"/>
+        <text x="160" y="16" text-anchor="middle" font-size="11" fill="#64748b">IQR focuses on the middle 50% — ignoring extremes</text>
+        <!-- Central horizontal line -->
+        <line x1="20" y1="55" x2="300" y2="55" stroke="#cbd5e1" stroke-width="2"/>
+        <!-- Whisker caps -->
+        <line x1="20" y1="44" x2="20" y2="66" stroke="#94a3b8" stroke-width="2.5"/>
+        <line x1="300" y1="44" x2="300" y2="66" stroke="#94a3b8" stroke-width="2.5"/>
+        <!-- IQR box -->
+        <rect x="95" y="38" width="130" height="34" rx="8" fill="#bfdbfe" stroke="#3d5a99" stroke-width="2.5"/>
+        <!-- Median vertical line -->
+        <line x1="160" y1="38" x2="160" y2="72" stroke="#3d5a99" stroke-width="3"/>
+        <!-- Labels below -->
+        <text x="20" y="85" text-anchor="middle" font-size="12" font-weight="700" fill="#94a3b8">Min</text>
+        <text x="95" y="85" text-anchor="middle" font-size="12" font-weight="700" fill="#3d5a99">Q1</text>
+        <text x="160" y="85" text-anchor="middle" font-size="12" font-weight="700" fill="#3d5a99">Median</text>
+        <text x="225" y="85" text-anchor="middle" font-size="12" font-weight="700" fill="#3d5a99">Q3</text>
+        <text x="300" y="85" text-anchor="middle" font-size="12" font-weight="700" fill="#94a3b8">Max</text>
+        <!-- Percentage labels -->
+        <text x="57" y="100" text-anchor="middle" font-size="11" fill="#94a3b8">25%</text>
+        <text x="160" y="108" text-anchor="middle" font-size="12" font-weight="800" fill="#3d5a99">IQR = Q3 − Q1  (middle 50%)</text>
+        <text x="262" y="100" text-anchor="middle" font-size="11" fill="#94a3b8">25%</text>
+      </svg>
+    </div>
+    <div class="visual-box">
+      <h4>🔔 Standard Deviation — The Best Measure</h4>
+      <p style="font-size:13px;color:var(--on-surface-variant);margin-bottom:12px;line-height:1.7">Standard deviation tells us the <strong>average distance</strong> of each point from the mean. A small SD = data close together. A large SD = data spread out.</p>
+      <svg viewBox="0 0 320 120" style="width:100%">
+        <rect width="320" height="120" fill="#f8faff" rx="12"/>
+        <!-- Left panel: Small SD -->
+        <rect x="10" y="10" width="135" height="100" rx="10" fill="#eff6ff"/>
+        <text x="77" y="28" text-anchor="middle" font-size="13" font-weight="800" fill="#3d5a99">Small SD</text>
+        <text x="77" y="43" text-anchor="middle" font-size="11" fill="#64748b">Points huddled together</text>
+        <!-- Dots close together -->
+        <circle cx="72" cy="68" r="22" fill="none" stroke="#3d5a99" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <circle cx="68" cy="66" r="5" fill="#3d5a99" opacity="0.8"/>
+        <circle cx="75" cy="72" r="5" fill="#3d5a99" opacity="0.8"/>
+        <circle cx="70" cy="75" r="5" fill="#3d5a99" opacity="0.8"/>
+        <circle cx="76" cy="64" r="5" fill="#3d5a99" opacity="0.8"/>
+        <circle cx="67" cy="73" r="5" fill="#3d5a99" opacity="0.8"/>
+        <circle cx="72" cy="68" r="4" fill="#ef4444"/>
+        <text x="77" y="105" text-anchor="middle" font-size="11" font-weight="700" fill="#3d5a99">SD ≈ 2</text>
+        <!-- Right panel: Large SD -->
+        <rect x="175" y="10" width="135" height="100" rx="10" fill="#fff8f8"/>
+        <text x="242" y="28" text-anchor="middle" font-size="13" font-weight="800" fill="#ef4444">Large SD</text>
+        <text x="242" y="43" text-anchor="middle" font-size="11" fill="#64748b">Points spread far out</text>
+        <!-- Dots far apart -->
+        <circle cx="242" cy="68" r="38" fill="none" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <circle cx="210" cy="50" r="5" fill="#ef4444" opacity="0.8"/>
+        <circle cx="270" cy="80" r="5" fill="#ef4444" opacity="0.8"/>
+        <circle cx="218" cy="90" r="5" fill="#ef4444" opacity="0.8"/>
+        <circle cx="268" cy="48" r="5" fill="#ef4444" opacity="0.8"/>
+        <circle cx="205" cy="72" r="5" fill="#ef4444" opacity="0.8"/>
+        <circle cx="275" cy="62" r="5" fill="#ef4444" opacity="0.8"/>
+        <circle cx="242" cy="68" r="4" fill="#3d5a99"/>
+        <text x="242" y="105" text-anchor="middle" font-size="11" font-weight="700" fill="#ef4444">SD ≈ 25</text>
+      </svg>
+    </div>
+    <div class="example-box">
+      <div class="ex-label">🧑‍🎓 Exam Score Example</div>
+      <p>Class A scores: <strong>68, 70, 69, 71, 72</strong> → Mean = 70, SD ≈ 1.4 (very consistent)<br><br>Class B scores: <strong>30, 55, 70, 85, 110</strong> → Mean = 70, SD ≈ 28 (very variable)<br><br>Same mean — totally different picture! Always report the SD alongside the mean.</p>
+    </div>`
+},
+
+'data-types': {
+  color:'linear-gradient(135deg,#1e6b8c,#0e7490)',
+  emoji:'🗂️',
+  title:'Types of Data',
+  subtitle:'Before you analyse anything, you need to know what kind of data you have. Different types need different methods!',
+  html:`
+    <div class="visual-box">
+      <h4>🗺️ The Big Map of Data Types</h4>
+      <svg viewBox="0 0 320 210" style="width:100%">
+        <rect width="320" height="210" fill="#f8faff" rx="12"/>
+        <!-- Root -->
+        <rect x="105" y="10" width="110" height="34" rx="10" fill="#1e6b8c"/>
+        <text x="160" y="32" text-anchor="middle" font-size="14" font-weight="800" fill="white">All Data</text>
+        <!-- Branch lines -->
+        <line x1="160" y1="44" x2="85" y2="72" stroke="#94a3b8" stroke-width="2"/>
+        <line x1="160" y1="44" x2="235" y2="72" stroke="#94a3b8" stroke-width="2"/>
+        <!-- Qualitative -->
+        <rect x="18" y="72" width="134" height="34" rx="10" fill="#fce7f3" stroke="#f9a8d4" stroke-width="1.5"/>
+        <text x="85" y="94" text-anchor="middle" font-size="13" font-weight="800" fill="#9d174d">Qualitative</text>
+        <!-- Quantitative -->
+        <rect x="168" y="72" width="134" height="34" rx="10" fill="#dbeafe" stroke="#93c5fd" stroke-width="1.5"/>
+        <text x="235" y="94" text-anchor="middle" font-size="13" font-weight="800" fill="#1e40af">Quantitative</text>
+        <!-- Sub-branch lines -->
+        <line x1="65" y1="106" x2="50" y2="128" stroke="#94a3b8" stroke-width="1.5"/>
+        <line x1="105" y1="106" x2="118" y2="128" stroke="#94a3b8" stroke-width="1.5"/>
+        <line x1="200" y1="106" x2="188" y2="128" stroke="#94a3b8" stroke-width="1.5"/>
+        <line x1="270" y1="106" x2="278" y2="128" stroke="#94a3b8" stroke-width="1.5"/>
+        <!-- Nominal -->
+        <rect x="10" y="128" width="82" height="30" rx="8" fill="#fce7f3" stroke="#f9a8d4" stroke-width="1.5"/>
+        <text x="51" y="148" text-anchor="middle" font-size="12" font-weight="700" fill="#9d174d">Nominal</text>
+        <!-- Ordinal -->
+        <rect x="96" y="128" width="82" height="30" rx="8" fill="#fce7f3" stroke="#f9a8d4" stroke-width="1.5"/>
+        <text x="137" y="148" text-anchor="middle" font-size="12" font-weight="700" fill="#9d174d">Ordinal</text>
+        <!-- Discrete -->
+        <rect x="152" y="128" width="82" height="30" rx="8" fill="#dbeafe" stroke="#93c5fd" stroke-width="1.5"/>
+        <text x="193" y="148" text-anchor="middle" font-size="12" font-weight="700" fill="#1e40af">Discrete</text>
+        <!-- Continuous -->
+        <rect x="238" y="128" width="72" height="30" rx="8" fill="#dbeafe" stroke="#93c5fd" stroke-width="1.5"/>
+        <text x="274" y="148" text-anchor="middle" font-size="12" font-weight="700" fill="#1e40af">Continuous</text>
+        <!-- Examples -->
+        <text x="51" y="172" text-anchor="middle" font-size="11" fill="#9d174d">blood type</text>
+        <text x="51" y="186" text-anchor="middle" font-size="11" fill="#db2777">eye colour</text>
+        <text x="137" y="172" text-anchor="middle" font-size="11" fill="#9d174d">star ratings</text>
+        <text x="137" y="186" text-anchor="middle" font-size="11" fill="#db2777">rankings</text>
+        <text x="193" y="172" text-anchor="middle" font-size="11" fill="#1e40af">no. of goals</text>
+        <text x="193" y="186" text-anchor="middle" font-size="11" fill="#2563eb">no. of kids</text>
+        <text x="274" y="172" text-anchor="middle" font-size="11" fill="#1e40af">height</text>
+        <text x="274" y="186" text-anchor="middle" font-size="11" fill="#2563eb">temperature</text>
+      </svg>
+    </div>
+    <div class="example-box">
+      <div class="ex-label">🌟 Real Life Examples</div>
+      <p>
+      🔵 <strong>Nominal:</strong> Your blood type (A, B, AB, O) — just labels, no order<br>
+      🟡 <strong>Ordinal:</strong> A movie rating (⭐⭐⭐) — ordered, but gap between 2★ and 3★ isn't equal to 3★ and 4★<br>
+      🟢 <strong>Discrete:</strong> Number of students in a class (you can't have 29.5 students!)<br>
+      🔴 <strong>Continuous:</strong> Your exact height (1.724m, 1.7243m… can be any value)
+      </p>
+    </div>
+    <div class="visual-box">
+      <h4>📊 Which Chart for Which Data?</h4>
+      <svg viewBox="0 0 320 150" style="width:100%">
+        <rect width="320" height="150" fill="#f8faff" rx="12"/>
+        <!-- Panel 1: Bar chart -->
+        <rect x="8" y="8" width="93" height="130" rx="10" fill="#fff8f8" stroke="#fca5a5" stroke-width="1.5"/>
+        <text x="54" y="26" text-anchor="middle" font-size="12" font-weight="800" fill="#9d174d">Bar Chart</text>
+        <text x="54" y="39" text-anchor="middle" font-size="10" fill="#9d174d">Nominal/Ordinal</text>
+        <rect x="20" y="50" width="18" height="48" rx="4" fill="#fca5a5"/>
+        <rect x="42" y="64" width="18" height="34" rx="4" fill="#fca5a5"/>
+        <rect x="64" y="56" width="18" height="42" rx="4" fill="#fca5a5"/>
+        <line x1="16" y1="98" x2="86" y2="98" stroke="#e2e8f0" stroke-width="1.5"/>
+        <text x="54" y="115" text-anchor="middle" font-size="10" fill="#94a3b8">Bars DON'T touch</text>
+        <text x="54" y="128" text-anchor="middle" font-size="10" fill="#94a3b8">(gaps between)</text>
+        <!-- Panel 2: Histogram -->
+        <rect x="114" y="8" width="93" height="130" rx="10" fill="#f0f9ff" stroke="#93c5fd" stroke-width="1.5"/>
+        <text x="160" y="26" text-anchor="middle" font-size="12" font-weight="800" fill="#1e40af">Histogram</text>
+        <text x="160" y="39" text-anchor="middle" font-size="10" fill="#1e40af">Continuous Data</text>
+        <rect x="124" y="72" width="16" height="26" rx="0" fill="#93c5fd"/>
+        <rect x="140" y="52" width="16" height="46" rx="0" fill="#93c5fd"/>
+        <rect x="156" y="42" width="16" height="56" rx="0" fill="#3d5a99"/>
+        <rect x="172" y="60" width="16" height="38" rx="0" fill="#93c5fd"/>
+        <rect x="188" y="78" width="14" height="20" rx="0" fill="#93c5fd"/>
+        <line x1="120" y1="98" x2="205" y2="98" stroke="#e2e8f0" stroke-width="1.5"/>
+        <text x="160" y="115" text-anchor="middle" font-size="10" fill="#94a3b8">Bars DO touch</text>
+        <text x="160" y="128" text-anchor="middle" font-size="10" fill="#94a3b8">(continuous scale)</text>
+        <!-- Panel 3: Pie -->
+        <rect x="220" y="8" width="92" height="130" rx="10" fill="#f0fdf4" stroke="#86efac" stroke-width="1.5"/>
+        <text x="266" y="26" text-anchor="middle" font-size="12" font-weight="800" fill="#166534">Pie Chart</text>
+        <text x="266" y="39" text-anchor="middle" font-size="10" fill="#166534">Nominal only</text>
+        <circle cx="266" cy="70" r="26" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+        <path d="M266,70 L266,44 A26,26 0 0,1 291,83 Z" fill="#16a34a"/>
+        <path d="M266,70 L291,83 A26,26 0 0,1 246,94 Z" fill="#4ade80"/>
+        <text x="266" y="113" text-anchor="middle" font-size="10" fill="#94a3b8">Show proportions</text>
+        <text x="266" y="126" text-anchor="middle" font-size="10" fill="#94a3b8">(parts of a whole)</text>
+      </svg>
+    </div>
+    <div class="tip-box">
+      <div class="tip-label">✅ Quick Rule</div>
+      <p><strong>Can you do maths on it?</strong><br>✅ Yes (height, weight, score) → Quantitative<br>❌ No (colour, type, name) → Qualitative<br><br><strong>Can it be a fraction?</strong><br>✅ Yes (1.72m, 36.6°C) → Continuous<br>❌ No (3 children, 7 goals) → Discrete</p>
+    </div>`
+},
+
+'probability': {
+  color:'linear-gradient(135deg,#166534,#15803d)',
+  emoji:'🎲',
+  title:'Probability',
+  subtitle:'Probability is just a number that tells us how likely something is — from 0 (impossible) to 1 (certain).',
+  html:`
+    <div class="visual-box">
+      <h4>📍 The Probability Scale</h4>
+      <svg viewBox="0 0 320 110" style="width:100%">
+        <rect width="320" height="110" fill="#f8faff" rx="12"/>
+        <defs><linearGradient id="pg" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#ef4444"/><stop offset="50%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#22c55e"/></linearGradient></defs>
+        <!-- Gradient bar -->
+        <rect x="12" y="22" width="296" height="20" rx="10" fill="url(#pg)"/>
+        <!-- Tick marks (below bar) -->
+        <line x1="12" y1="42" x2="12" y2="52" stroke="#333" stroke-width="2.5"/>
+        <line x1="86" y1="42" x2="86" y2="50" stroke="#555" stroke-width="2"/>
+        <line x1="160" y1="42" x2="160" y2="52" stroke="#333" stroke-width="2.5"/>
+        <line x1="234" y1="42" x2="234" y2="50" stroke="#555" stroke-width="2"/>
+        <line x1="308" y1="42" x2="308" y2="52" stroke="#333" stroke-width="2.5"/>
+        <!-- Numbers ABOVE bar (small, tight) -->
+        <text x="12" y="18" text-anchor="middle" font-size="11" font-weight="800" fill="#ef4444">0</text>
+        <text x="86" y="18" text-anchor="middle" font-size="10" fill="#64748b">0.25</text>
+        <text x="160" y="18" text-anchor="middle" font-size="11" font-weight="800" fill="#f59e0b">0.5</text>
+        <text x="234" y="18" text-anchor="middle" font-size="10" fill="#64748b">0.75</text>
+        <text x="308" y="18" text-anchor="middle" font-size="11" font-weight="800" fill="#22c55e">1</text>
+        <!-- Word labels below bar -->
+        <text x="12" y="68" text-anchor="middle" font-size="12" font-weight="800" fill="#ef4444">Impossible</text>
+        <text x="86" y="68" text-anchor="middle" font-size="11" fill="#64748b">Unlikely</text>
+        <text x="160" y="68" text-anchor="middle" font-size="12" font-weight="800" fill="#f59e0b">50 / 50</text>
+        <text x="234" y="68" text-anchor="middle" font-size="11" fill="#64748b">Likely</text>
+        <text x="308" y="68" text-anchor="middle" font-size="12" font-weight="800" fill="#22c55e">Certain</text>
+        <!-- Example labels -->
+        <text x="12" y="84" text-anchor="middle" font-size="10" fill="#94a3b8">pigs fly</text>
+        <text x="160" y="84" text-anchor="middle" font-size="10" fill="#94a3b8">coin flip</text>
+        <text x="308" y="84" text-anchor="middle" font-size="10" fill="#94a3b8">sun rises</text>
+        <!-- Caption at bottom -->
+        <text x="160" y="102" text-anchor="middle" font-size="11" fill="#94a3b8">Probability always stays between 0 and 1</text>
+      </svg>
+    </div>
+    <div class="example-box">
+      <div class="ex-label">🎲 Dice Example</div>
+      <p>Rolling a standard 6-sided die:<br>
+      P(rolling a 3) = 1 ÷ 6 ≈ <strong>0.167</strong><br>
+      P(rolling an even number) = 3 ÷ 6 = <strong>0.5</strong><br>
+      P(rolling a 7) = 0 ÷ 6 = <strong>0 (impossible!)</strong><br>
+      P(rolling 1–6) = 6 ÷ 6 = <strong>1 (certain!)</strong></p>
+    </div>
+    <div class="visual-box">
+      <h4>🌳 Tree Diagram — Coin Flip × 2</h4>
+      <svg viewBox="0 0 320 200" style="width:100%">
+        <rect width="320" height="200" fill="#f8faff" rx="12"/>
+        <text x="160" y="14" text-anchor="middle" font-size="11" fill="#64748b">Flip a coin twice — 4 equally likely outcomes</text>
+        <!-- Start node (small) -->
+        <circle cx="28" cy="100" r="13" fill="#3d5a99"/>
+        <text x="28" y="104" text-anchor="middle" font-size="9" font-weight="800" fill="white">Start</text>
+        <!-- 1st flip branch lines -->
+        <line x1="41" y1="90" x2="84" y2="58" stroke="#94a3b8" stroke-width="1.5"/>
+        <line x1="41" y1="110" x2="84" y2="142" stroke="#94a3b8" stroke-width="1.5"/>
+        <!-- Prob labels -->
+        <text x="58" y="66" text-anchor="middle" font-size="11" font-weight="700" fill="#22c55e">½</text>
+        <text x="58" y="136" text-anchor="middle" font-size="11" font-weight="700" fill="#ef4444">½</text>
+        <!-- 1st level: H and T (medium) -->
+        <circle cx="97" cy="55" r="13" fill="#22c55e"/>
+        <text x="97" y="59" text-anchor="middle" font-size="13" font-weight="800" fill="white">H</text>
+        <circle cx="97" cy="145" r="13" fill="#ef4444"/>
+        <text x="97" y="149" text-anchor="middle" font-size="13" font-weight="800" fill="white">T</text>
+        <!-- 2nd flip branches from H -->
+        <line x1="110" y1="46" x2="150" y2="32" stroke="#94a3b8" stroke-width="1.5"/>
+        <line x1="110" y1="64" x2="150" y2="78" stroke="#94a3b8" stroke-width="1.5"/>
+        <!-- 2nd flip branches from T -->
+        <line x1="110" y1="136" x2="150" y2="122" stroke="#94a3b8" stroke-width="1.5"/>
+        <line x1="110" y1="154" x2="150" y2="168" stroke="#94a3b8" stroke-width="1.5"/>
+        <!-- 2nd level nodes -->
+        <circle cx="163" cy="30" r="13" fill="#22c55e"/>
+        <text x="163" y="34" text-anchor="middle" font-size="13" font-weight="800" fill="white">H</text>
+        <circle cx="163" cy="80" r="13" fill="#ef4444"/>
+        <text x="163" y="84" text-anchor="middle" font-size="13" font-weight="800" fill="white">T</text>
+        <circle cx="163" cy="120" r="13" fill="#22c55e"/>
+        <text x="163" y="124" text-anchor="middle" font-size="13" font-weight="800" fill="white">H</text>
+        <circle cx="163" cy="170" r="13" fill="#ef4444"/>
+        <text x="163" y="174" text-anchor="middle" font-size="13" font-weight="800" fill="white">T</text>
+        <!-- Outcome result boxes -->
+        <rect x="184" y="20" width="130" height="22" rx="8" fill="#dcfce7" stroke="#86efac" stroke-width="1"/>
+        <text x="249" y="35" text-anchor="middle" font-size="12" font-weight="800" fill="#166534">HH = ¼ = 25%</text>
+        <rect x="184" y="70" width="130" height="22" rx="8" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="1"/>
+        <text x="249" y="85" text-anchor="middle" font-size="12" fill="#475569">HT = ¼ = 25%</text>
+        <rect x="184" y="110" width="130" height="22" rx="8" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="1"/>
+        <text x="249" y="125" text-anchor="middle" font-size="12" fill="#475569">TH = ¼ = 25%</text>
+        <rect x="184" y="160" width="130" height="22" rx="8" fill="#fce7f3" stroke="#fca5a5" stroke-width="1"/>
+        <text x="249" y="175" text-anchor="middle" font-size="12" font-weight="800" fill="#b91c1c">TT = ¼ = 25%</text>
+        <!-- Total label -->
+        <text x="249" y="196" text-anchor="middle" font-size="10" fill="#94a3b8">Total: 4 outcomes, each = 25%</text>
+      </svg>
+    </div>
+    <div class="tip-box">
+      <div class="tip-label">✅ Key Rules to Remember</div>
+      <p>➕ <strong>Addition (OR):</strong> P(A or B) = P(A) + P(B) − P(both) — don't double count!<br><br>✖️ <strong>Multiplication (AND):</strong> P(A and B) = P(A) × P(B) for independent events<br><br>🔄 <strong>Complement:</strong> P(NOT A) = 1 − P(A) — always!</p>
+    </div>`
+},
+
+'distributions': {
+  color:'linear-gradient(135deg,#5c4d9e,#7c3aed)',
+  emoji:'🔔',
+  title:'The Bell Curve (Normal Distribution)',
+  subtitle:'The most important shape in all of statistics. It shows up in exam scores, heights, blood pressure — almost everywhere!',
+  html:`
+    <div class="visual-box">
+      <h4>🔔 What Does the Bell Curve Look Like?</h4>
+      <svg viewBox="0 0 320 165" style="width:100%">
+        <rect width="320" height="165" fill="#f8faff" rx="12"/>
+        <!-- SD region fills (back to front) -->
+        <!-- 3σ region -->
+        <path d="M18,128 Q38,126 58,118 Q78,106 98,88 Q118,66 138,44 Q158,28 168,22 Q178,28 198,44 Q218,66 238,88 Q258,106 278,118 Q298,126 318,128 Z" fill="rgba(30,107,140,0.07)"/>
+        <!-- 2σ region -->
+        <path d="M58,118 Q78,106 98,88 Q118,66 138,44 Q158,28 168,22 Q178,28 198,44 Q218,66 238,88 Q258,106 278,118 Z" fill="rgba(30,107,140,0.10)"/>
+        <!-- 1σ region -->
+        <path d="M98,88 Q118,66 138,44 Q158,28 168,22 Q178,28 198,44 Q218,66 238,88 Z" fill="rgba(92,77,158,0.18)"/>
+        <!-- Bell curve outline -->
+        <path d="M18,128 Q38,126 58,118 Q78,106 98,88 Q118,66 138,44 Q158,28 168,22 Q178,28 198,44 Q218,66 238,88 Q258,106 278,118 Q298,126 318,128" stroke="#5c4d9e" stroke-width="2.5" fill="none"/>
+        <!-- Mean line -->
+        <line x1="168" y1="22" x2="168" y2="130" stroke="#5c4d9e" stroke-width="2" stroke-dasharray="5,3"/>
+        <!-- SD marker lines -->
+        <line x1="98" y1="88" x2="98" y2="130" stroke="#5c4d9e" stroke-width="1" stroke-dasharray="3,3" opacity="0.5"/>
+        <line x1="238" y1="88" x2="238" y2="130" stroke="#5c4d9e" stroke-width="1" stroke-dasharray="3,3" opacity="0.5"/>
+        <line x1="58" y1="118" x2="58" y2="130" stroke="#1e6b8c" stroke-width="1" stroke-dasharray="3,3" opacity="0.5"/>
+        <line x1="278" y1="118" x2="278" y2="130" stroke="#1e6b8c" stroke-width="1" stroke-dasharray="3,3" opacity="0.5"/>
+        <!-- SD labels on top -->
+        <text x="98" y="16" text-anchor="middle" font-size="12" fill="#5c4d9e">−1σ</text>
+        <text x="238" y="16" text-anchor="middle" font-size="12" fill="#5c4d9e">+1σ</text>
+        <text x="58" y="16" text-anchor="middle" font-size="12" fill="#1e6b8c">−2σ</text>
+        <text x="278" y="16" text-anchor="middle" font-size="12" fill="#1e6b8c">+2σ</text>
+        <text x="168" y="16" text-anchor="middle" font-size="12" font-weight="800" fill="#5c4d9e">Mean</text>
+        <!-- 68% bracket -->
+        <line x1="98" y1="138" x2="238" y2="138" stroke="#5c4d9e" stroke-width="2.5" stroke-linecap="round"/>
+        <text x="168" y="150" text-anchor="middle" font-size="12" font-weight="800" fill="#5c4d9e">68% within 1 SD</text>
+        <!-- 95% bracket -->
+        <line x1="58" y1="155" x2="278" y2="155" stroke="#1e6b8c" stroke-width="2.5" stroke-linecap="round"/>
+        <text x="168" y="164" text-anchor="middle" font-size="12" font-weight="800" fill="#1e6b8c">95% within 2 SDs</text>
+      </svg>
+    </div>
+    <div class="example-box">
+      <div class="ex-label">🎓 Exam Score Example</div>
+      <p>A class of 200 students. Mean exam score = <strong>65</strong>, SD = <strong>10</strong>.<br><br>
+      🔵 About <strong>68%</strong> of students scored between 55 and 75 (within 1 SD)<br>
+      🟢 About <strong>95%</strong> scored between 45 and 85 (within 2 SDs)<br>
+      🔴 Only <strong>0.3%</strong> scored below 35 or above 95 (beyond 3 SDs)</p>
+    </div>
+    <div class="visual-box">
+      <h4>📐 Z-Score — Comparing Across Different Tests</h4>
+      <p style="font-size:13px;color:var(--on-surface-variant);margin-bottom:12px;line-height:1.7">A z-score tells you how many SDs above or below the mean a value is. Useful for comparing performance across different scales.</p>
+      <svg viewBox="0 0 320 110" style="width:100%">
+        <rect width="320" height="110" fill="#f8faff" rx="12"/>
+        <text x="160" y="16" text-anchor="middle" font-size="11" fill="#64748b">Same raw score ≠ same performance — z-scores reveal the truth!</text>
+        <!-- Panel A: Maths -->
+        <rect x="10" y="24" width="140" height="78" rx="12" fill="#eff6ff" stroke="#93c5fd" stroke-width="1.5"/>
+        <text x="80" y="42" text-anchor="middle" font-size="13" font-weight="800" fill="#1e40af">📐 Maths Test</text>
+        <text x="80" y="58" text-anchor="middle" font-size="20" font-weight="800" fill="#1e40af">Score: 80</text>
+        <text x="80" y="74" text-anchor="middle" font-size="11" fill="#64748b">Mean=70, SD=10</text>
+        <text x="80" y="92" text-anchor="middle" font-size="13" font-weight="800" fill="#3d5a99">z = +1.0</text>
+        <!-- Panel B: English -->
+        <rect x="170" y="24" width="140" height="78" rx="12" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1.5"/>
+        <text x="240" y="42" text-anchor="middle" font-size="13" font-weight="800" fill="#5c4d9e">📖 English Test</text>
+        <text x="240" y="58" text-anchor="middle" font-size="20" font-weight="800" fill="#5c4d9e">Score: 75</text>
+        <text x="240" y="74" text-anchor="middle" font-size="11" fill="#64748b">Mean=60, SD=5</text>
+        <text x="240" y="92" text-anchor="middle" font-size="13" font-weight="800" fill="#7c3aed">z = +3.0 ⭐</text>
+      </svg>
+      <p style="font-size:12px;color:var(--on-surface-variant);margin-top:10px;line-height:1.6">Despite the lower raw score, the English result (z=+3) is actually <strong>more impressive</strong> than the Maths result (z=+1)!</p>
+    </div>
+    <div class="tip-box">
+      <div class="tip-label">✅ The 68–95–99.7 Rule</div>
+      <p>For ANY normal distribution:<br>
+      📊 <strong>68%</strong> of values fall within <strong>1 SD</strong> of the mean<br>
+      📊 <strong>95%</strong> fall within <strong>2 SDs</strong> of the mean<br>
+      📊 <strong>99.7%</strong> fall within <strong>3 SDs</strong> of the mean<br><br>
+      Memorise this! It comes up everywhere.</p>
+    </div>`
+},
+
+'hypothesis': {
+  color:'linear-gradient(135deg,#b91c1c,#dc2626)',
+  emoji:'🔬',
+  title:'Hypothesis Testing',
+  subtitle:'A formal way to test whether a claim about the world is supported by your data — or whether it could just be chance.',
+  html:`
+    <div class="visual-box">
+      <h4>🤔 The Core Idea</h4>
+      <p style="font-size:13px;color:var(--on-surface-variant);margin-bottom:14px;line-height:1.7">Imagine a company claims their new medicine reduces blood pressure. You give it to 50 patients and see an improvement. But could that improvement be <strong>random chance</strong>? Hypothesis testing helps us decide!</p>
+      <svg viewBox="0 0 320 110" style="width:100%">
+        <rect width="320" height="110" fill="#f8faff" rx="12"/>
+        <text x="160" y="16" text-anchor="middle" font-size="11" fill="#64748b">We always start by assuming H₀ is true, then test it</text>
+        <!-- H0 panel -->
+        <rect x="10" y="24" width="140" height="78" rx="12" fill="#fff8f8" stroke="#ef4444" stroke-width="2"/>
+        <text x="80" y="46" text-anchor="middle" font-size="13" font-weight="800" fill="#ef4444">H₀  Null Hypothesis</text>
+        <text x="80" y="62" text-anchor="middle" font-size="12" fill="#475569">"The drug does</text>
+        <text x="80" y="76" text-anchor="middle" font-size="12" fill="#475569">NOT work"</text>
+        <text x="80" y="94" text-anchor="middle" font-size="11" fill="#94a3b8">← default belief</text>
+        <!-- H1 panel -->
+        <rect x="170" y="24" width="140" height="78" rx="12" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/>
+        <text x="240" y="46" text-anchor="middle" font-size="13" font-weight="800" fill="#16a34a">H₁  Alternative</text>
+        <text x="240" y="62" text-anchor="middle" font-size="12" fill="#475569">"The drug DOES</text>
+        <text x="240" y="76" text-anchor="middle" font-size="12" fill="#475569">work"</text>
+        <text x="240" y="94" text-anchor="middle" font-size="11" fill="#94a3b8">← what we want to prove</text>
+      </svg>
+    </div>
+    <div class="visual-box">
+      <h4>🚦 The 6 Steps</h4>
+      <div class="step-list">
+        <div class="step-item"><div class="step-num">1</div><div class="step-text"><strong>State your hypotheses</strong> — Write H₀ (no effect) and H₁ (there is an effect)</div></div>
+        <div class="step-item"><div class="step-num">2</div><div class="step-text"><strong>Choose significance level α</strong> — Usually 0.05 (5%). This is how much risk of being wrong you'll accept</div></div>
+        <div class="step-item"><div class="step-num">3</div><div class="step-text"><strong>Collect data</strong> and calculate a test statistic (e.g. t-value)</div></div>
+        <div class="step-item"><div class="step-num">4</div><div class="step-text"><strong>Calculate the p-value</strong> — probability of getting these results IF H₀ were true</div></div>
+        <div class="step-item"><div class="step-num">5</div><div class="step-text"><strong>Make a decision:</strong> If p &lt; α → reject H₀. If p ≥ α → fail to reject H₀</div></div>
+        <div class="step-item"><div class="step-num">6</div><div class="step-text"><strong>Write a conclusion</strong> in plain English — relate back to the original question</div></div>
+      </div>
+    </div>
+    <div class="example-box">
+      <div class="ex-label">💊 Medicine Example</div>
+      <p>H₀: "The drug does not reduce blood pressure" | H₁: "It does"<br><br>
+      After testing 50 patients, we calculate p = <strong>0.02</strong>.<br>
+      Our threshold is α = 0.05.<br><br>
+      Since 0.02 &lt; 0.05 → We <strong>reject H₀</strong>. There is significant evidence the drug works!</p>
+    </div>
+    <div class="visual-box">
+      <h4>⚠️ Two Types of Mistakes</h4>
+      <svg viewBox="0 0 320 140" style="width:100%">
+        <rect width="320" height="140" fill="#f8faff" rx="12"/>
+        <text x="160" y="16" text-anchor="middle" font-size="12" font-weight="700" fill="#475569">Two ways you can go wrong…</text>
+        <!-- Column headers -->
+        <rect x="130" y="24" width="86" height="30" rx="8" fill="#e2e8f0"/>
+        <text x="173" y="43" text-anchor="middle" font-size="12" font-weight="700" fill="#334155">Reality: H₀ True</text>
+        <rect x="222" y="24" width="90" height="30" rx="8" fill="#e2e8f0"/>
+        <text x="267" y="43" text-anchor="middle" font-size="12" font-weight="700" fill="#334155">Reality: H₀ False</text>
+        <!-- Row 1: Reject H0 -->
+        <text x="65" y="76" text-anchor="middle" font-size="12" font-weight="700" fill="#475569">Your decision:</text>
+        <text x="65" y="91" text-anchor="middle" font-size="12" fill="#475569">Reject H₀</text>
+        <rect x="130" y="60" width="86" height="40" rx="8" fill="#fce7f3" stroke="#f9a8d4" stroke-width="1.5"/>
+        <text x="173" y="78" text-anchor="middle" font-size="12" font-weight="800" fill="#b91c1c">Type I Error ❌</text>
+        <text x="173" y="93" text-anchor="middle" font-size="11" fill="#9d174d">False Positive</text>
+        <rect x="222" y="60" width="90" height="40" rx="8" fill="#dcfce7" stroke="#86efac" stroke-width="1.5"/>
+        <text x="267" y="84" text-anchor="middle" font-size="13" font-weight="800" fill="#166534">Correct ✓</text>
+        <!-- Row 2: Keep H0 -->
+        <text x="65" y="120" text-anchor="middle" font-size="12" fill="#475569">Keep H₀</text>
+        <rect x="130" y="106" width="86" height="28" rx="8" fill="#dcfce7" stroke="#86efac" stroke-width="1.5"/>
+        <text x="173" y="124" text-anchor="middle" font-size="13" font-weight="800" fill="#166534">Correct ✓</text>
+        <rect x="222" y="106" width="90" height="28" rx="8" fill="#fce7f3" stroke="#f9a8d4" stroke-width="1.5"/>
+        <text x="267" y="118" text-anchor="middle" font-size="12" font-weight="800" fill="#b91c1c">Type II Error ❌</text>
+        <text x="267" y="130" text-anchor="middle" font-size="11" fill="#9d174d">False Negative</text>
+      </svg>
+    </div>
+    <div class="misconception-box">
+      <div class="mc-label">🚫 Common Misconceptions</div>
+      <div class="mc-row"><span class="mc-wrong">✗</span><span>"p = 0.03 means there's a 3% chance H₀ is true"</span></div>
+      <div class="mc-row"><span class="mc-right">✓</span><span>"There's a 3% chance of seeing this data if H₀ were true"</span></div>
+      <div class="mc-row" style="margin-top:8px"><span class="mc-wrong">✗</span><span>"Failing to reject H₀ proves it is true"</span></div>
+      <div class="mc-row"><span class="mc-right">✓</span><span>"We just don't have enough evidence to reject it yet"</span></div>
+    </div>`
+},
+
+'correlation': {
+  color:'linear-gradient(135deg,#1e6b8c,#0284c7)',
+  emoji:'📉',
+  title:'Correlation & Regression',
+  subtitle:'Correlation measures whether two things move together. Regression lets you predict one from the other.',
+  html:`
+    <div class="visual-box">
+      <h4>🔗 Types of Correlation</h4>
+      <svg viewBox="0 0 320 140" style="width:100%">
+        <rect width="320" height="140" fill="#f8faff" rx="12"/>
+        <!-- Panel 1: Positive correlation -->
+        <rect x="6" y="8" width="96" height="122" rx="10" fill="#f0fdf4" stroke="#86efac" stroke-width="1.5"/>
+        <text x="54" y="24" text-anchor="middle" font-size="12" font-weight="800" fill="#166534">Positive</text>
+        <text x="54" y="37" text-anchor="middle" font-size="11" fill="#16a34a">r ≈ +0.9</text>
+        <!-- Axes -->
+        <line x1="18" y1="105" x2="92" y2="105" stroke="#d1fae5" stroke-width="1.5"/>
+        <line x1="18" y1="105" x2="18" y2="47" stroke="#d1fae5" stroke-width="1.5"/>
+        <!-- Dots going up-right -->
+        <circle cx="24" cy="100" r="4" fill="#16a34a"/>
+        <circle cx="34" cy="92" r="4" fill="#16a34a"/>
+        <circle cx="44" cy="84" r="4" fill="#16a34a"/>
+        <circle cx="54" cy="75" r="4" fill="#16a34a"/>
+        <circle cx="64" cy="66" r="4" fill="#16a34a"/>
+        <circle cx="74" cy="57" r="4" fill="#16a34a"/>
+        <circle cx="84" cy="50" r="4" fill="#16a34a"/>
+        <line x1="20" y1="103" x2="88" y2="48" stroke="#16a34a" stroke-width="2"/>
+        <text x="54" y="120" text-anchor="middle" font-size="11" fill="#166534">↑ one → ↑ other</text>
+        <!-- Panel 2: No correlation -->
+        <rect x="112" y="8" width="96" height="122" rx="10" fill="#f8faff" stroke="#e2e8f0" stroke-width="1.5"/>
+        <text x="160" y="24" text-anchor="middle" font-size="12" font-weight="800" fill="#64748b">None</text>
+        <text x="160" y="37" text-anchor="middle" font-size="11" fill="#94a3b8">r ≈ 0</text>
+        <line x1="124" y1="105" x2="198" y2="105" stroke="#e2e8f0" stroke-width="1.5"/>
+        <line x1="124" y1="105" x2="124" y2="47" stroke="#e2e8f0" stroke-width="1.5"/>
+        <circle cx="130" cy="80" r="4" fill="#94a3b8"/>
+        <circle cx="140" cy="55" r="4" fill="#94a3b8"/>
+        <circle cx="150" cy="95" r="4" fill="#94a3b8"/>
+        <circle cx="160" cy="50" r="4" fill="#94a3b8"/>
+        <circle cx="170" cy="85" r="4" fill="#94a3b8"/>
+        <circle cx="180" cy="60" r="4" fill="#94a3b8"/>
+        <circle cx="190" cy="100" r="4" fill="#94a3b8"/>
+        <line x1="126" y1="76" x2="194" y2="76" stroke="#94a3b8" stroke-width="2" stroke-dasharray="4,3"/>
+        <text x="160" y="120" text-anchor="middle" font-size="11" fill="#94a3b8">no pattern</text>
+        <!-- Panel 3: Negative correlation -->
+        <rect x="218" y="8" width="96" height="122" rx="10" fill="#fff8f8" stroke="#fca5a5" stroke-width="1.5"/>
+        <text x="266" y="24" text-anchor="middle" font-size="12" font-weight="800" fill="#b91c1c">Negative</text>
+        <text x="266" y="37" text-anchor="middle" font-size="11" fill="#ef4444">r ≈ −0.9</text>
+        <line x1="230" y1="105" x2="304" y2="105" stroke="#fce7f3" stroke-width="1.5"/>
+        <line x1="230" y1="105" x2="230" y2="47" stroke="#fce7f3" stroke-width="1.5"/>
+        <circle cx="236" cy="50" r="4" fill="#ef4444"/>
+        <circle cx="246" cy="58" r="4" fill="#ef4444"/>
+        <circle cx="256" cy="67" r="4" fill="#ef4444"/>
+        <circle cx="266" cy="76" r="4" fill="#ef4444"/>
+        <circle cx="276" cy="84" r="4" fill="#ef4444"/>
+        <circle cx="286" cy="93" r="4" fill="#ef4444"/>
+        <circle cx="296" cy="101" r="4" fill="#ef4444"/>
+        <line x1="232" y1="48" x2="298" y2="103" stroke="#ef4444" stroke-width="2"/>
+        <text x="266" y="120" text-anchor="middle" font-size="11" fill="#b91c1c">↑ one → ↓ other</text>
+      </svg>
+    </div>
+    <div class="example-box">
+      <div class="ex-label">🌡️ Real Life Examples</div>
+      <p>📈 <strong>Positive:</strong> Height & shoe size — taller people tend to have bigger feet<br>
+      📉 <strong>Negative:</strong> Temperature & hot drink sales — hotter days = fewer teas sold<br>
+      📊 <strong>None:</strong> Shoe size & exam score — no relationship!</p>
+    </div>
+    <div class="misconception-box">
+      <div class="mc-label">🚫 Correlation ≠ Causation!</div>
+      <div class="mc-row"><span class="mc-wrong">✗</span><span>Ice cream sales and drowning rates are correlated → ice cream causes drowning!</span></div>
+      <div class="mc-row"><span class="mc-right">✓</span><span>Both are caused by a third variable: <strong>hot weather</strong>. Always look for lurking variables!</span></div>
+    </div>
+    <div class="tip-box">
+      <div class="tip-label">✅ Strength of Correlation</div>
+      <p>|r| &gt; 0.7 → <strong>Strong</strong><br>0.4 &lt; |r| &lt; 0.7 → <strong>Moderate</strong><br>|r| &lt; 0.4 → <strong>Weak</strong><br><br>R² (r squared) tells you the % of variation in y explained by x. If r = 0.8, then R² = 0.64 → x explains 64% of the variation in y.</p>
+    </div>`
+},
+
+'confidence': {
+  color:'linear-gradient(135deg,#5c4d9e,#4338ca)',
+  emoji:'🎯',
+  title:'Confidence Intervals',
+  subtitle:'A confidence interval gives us a range of plausible values for a population statistic — plus an honest admission of our uncertainty.',
+  html:`
+    <div class="visual-box">
+      <h4>🎯 The Idea: We Can't Measure Everyone!</h4>
+      <p style="font-size:13px;color:var(--on-surface-variant);margin-bottom:14px;line-height:1.7">We want to know the average height of all adults in Sri Lanka. We can't measure everyone — so we measure <strong>100 people</strong> and use their average to estimate the true population average. But how confident can we be?</p>
+      <svg viewBox="0 0 320 110" style="width:100%">
+        <rect width="320" height="110" fill="#f8faff" rx="12"/>
+        <text x="160" y="15" text-anchor="middle" font-size="11" fill="#64748b">We can't measure everyone — so we estimate from a sample</text>
+        <!-- Population circle -->
+        <circle cx="52" cy="62" r="38" fill="none" stroke="#5c4d9e" stroke-width="2" stroke-dasharray="5,3"/>
+        <text x="52" y="52" text-anchor="middle" font-size="12" font-weight="800" fill="#5c4d9e">Population</text>
+        <text x="52" y="67" text-anchor="middle" font-size="11" fill="#64748b">μ = unknown</text>
+        <text x="52" y="82" text-anchor="middle" font-size="11" fill="#94a3b8">true mean</text>
+        <!-- Arrow -->
+        <defs><marker id="arr2" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#94a3b8"/></marker></defs>
+        <line x1="94" y1="62" x2="126" y2="62" stroke="#94a3b8" stroke-width="2" marker-end="url(#arr2)"/>
+        <text x="110" y="56" text-anchor="middle" font-size="10" fill="#94a3b8">sample</text>
+        <!-- Sample box -->
+        <rect x="130" y="36" width="76" height="52" rx="10" fill="#eff6ff" stroke="#3d5a99" stroke-width="2"/>
+        <text x="168" y="54" text-anchor="middle" font-size="12" font-weight="800" fill="#3d5a99">n = 100</text>
+        <text x="168" y="70" text-anchor="middle" font-size="12" fill="#64748b">x̄ = 168 cm</text>
+        <!-- Arrow -->
+        <line x1="208" y1="62" x2="230" y2="62" stroke="#94a3b8" stroke-width="2" marker-end="url(#arr2)"/>
+        <text x="219" y="56" text-anchor="middle" font-size="10" fill="#94a3b8">build CI</text>
+        <!-- CI box -->
+        <rect x="234" y="28" width="78" height="68" rx="10" fill="#f5f3ff" stroke="#5c4d9e" stroke-width="2"/>
+        <text x="273" y="47" text-anchor="middle" font-size="12" font-weight="800" fill="#5c4d9e">95% CI</text>
+        <text x="273" y="63" text-anchor="middle" font-size="14" font-weight="800" fill="#5c4d9e">165–171</text>
+        <text x="273" y="78" text-anchor="middle" font-size="11" fill="#64748b">centimetres</text>
+        <text x="273" y="92" text-anchor="middle" font-size="10" fill="#7c3aed">plausible range</text>
+      </svg>
+    </div>
+    <div class="example-box">
+      <div class="ex-label">📺 Opinion Poll Example</div>
+      <p>You've seen this on the news: <strong>"45% of voters support Party A ± 3%"</strong><br><br>That ±3% IS a confidence interval! It means the pollsters are fairly confident the true support is between <strong>42% and 48%</strong>.<br><br>The ±3% is called the <strong>margin of error</strong>.</p>
+    </div>
+    <div class="visual-box">
+      <h4>📐 What 95% Confidence Actually Means</h4>
+      <svg viewBox="0 0 320 150" style="width:100%">
+        <rect width="320" height="150" fill="#f8faff" rx="12"/>
+        <text x="160" y="16" text-anchor="middle" font-size="12" font-weight="700" fill="#475569">Run the same study 20 times — 95% of CIs will capture μ</text>
+        <!-- True mean line -->
+        <line x1="158" y1="24" x2="158" y2="132" stroke="#ef4444" stroke-width="2.5" stroke-dasharray="5,3"/>
+        <text x="158" y="22" text-anchor="middle" font-size="12" font-weight="800" fill="#ef4444">True Mean μ</text>
+        <!-- CI bars — 4 that hit, then 1 red that misses, then 2 more -->
+        <!-- Bar 1 ✓ -->
+        <line x1="98" y1="34" x2="205" y2="34" stroke="#3d5a99" stroke-width="4" stroke-linecap="round"/>
+        <text x="216" y="38" font-size="12" font-weight="700" fill="#166534">✓ hits μ</text>
+        <!-- Bar 2 ✓ -->
+        <line x1="110" y1="50" x2="215" y2="50" stroke="#3d5a99" stroke-width="4" stroke-linecap="round"/>
+        <text x="226" y="54" font-size="12" font-weight="700" fill="#166534">✓ hits μ</text>
+        <!-- Bar 3 ✓ -->
+        <line x1="88" y1="66" x2="198" y2="66" stroke="#3d5a99" stroke-width="4" stroke-linecap="round"/>
+        <text x="209" y="70" font-size="12" font-weight="700" fill="#166534">✓ hits μ</text>
+        <!-- Bar 4 ✗ MISS -->
+        <line x1="172" y1="82" x2="275" y2="82" stroke="#ef4444" stroke-width="4" stroke-linecap="round"/>
+        <text x="286" y="86" font-size="12" font-weight="800" fill="#b91c1c">✗ misses!</text>
+        <!-- Bar 5 ✓ -->
+        <line x1="102" y1="98" x2="210" y2="98" stroke="#3d5a99" stroke-width="4" stroke-linecap="round"/>
+        <text x="221" y="102" font-size="12" font-weight="700" fill="#166534">✓ hits μ</text>
+        <!-- Bar 6 ✓ -->
+        <line x1="94" y1="114" x2="200" y2="114" stroke="#3d5a99" stroke-width="4" stroke-linecap="round"/>
+        <text x="211" y="118" font-size="12" font-weight="700" fill="#166534">✓ hits μ</text>
+        <!-- Caption -->
+        <text x="160" y="138" text-anchor="middle" font-size="12" font-weight="700" fill="#475569">~1 in 20 intervals misses — that's what 95% means!</text>
+      </svg>
+    </div>
+    <div class="misconception-box">
+      <div class="mc-label">🚫 The Most Common Mistake!</div>
+      <div class="mc-row"><span class="mc-wrong">✗</span><span>"There is a 95% probability that the true mean lies in THIS interval"</span></div>
+      <div class="mc-row"><span class="mc-right">✓</span><span>"If we repeated this study 100 times, about 95 of our intervals would contain the true mean"</span></div>
+    </div>`
+}
+};
+
+function goToTopic(key) {
+  const t = topicData[key];
+  if (!t) return;
+  document.getElementById('topic-content').innerHTML = `
+    <div class="topic-hero-bar" style="background:${t.color}">
+      <div style="font-size:32px;margin-bottom:8px">${t.emoji}</div>
+      <h2>${t.title}</h2>
+      <p>${t.subtitle}</p>
+    </div>
+    ${t.html}
+    <div style="margin-top:20px">
+      <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="filterCards('${key==='intro'?'all':key}',null);goTo('screen-flashcards')">
+        <span class="material-symbols-outlined">style</span> Study Flashcards for This Topic
+      </button>
+    </div>`;
+  goTo('screen-topic');
+}
+
+// ══════════ FLASHCARD ENGINE ══════════
+const allCards = [
+  {id:'d1',t:'descriptive',e:'📊',q:'What is the mean?',hint:'Add up, divide',a:'The arithmetic average: add all values and divide by the count. Formula: x̄ = Σx ÷ n',tip:'Sensitive to outliers — one extreme value can change it a lot.'},
+  {id:'d2',t:'descriptive',e:'📊',q:'What is the median?',hint:'Middle value',a:'The middle value when data is sorted. Half the values are above, half below.',tip:'Not affected by outliers — use with skewed data like house prices.'},
+  {id:'d3',t:'descriptive',e:'🎯',q:'What is the mode?',hint:'Most frequent',a:'The value that appears most often. A dataset can have no mode, one mode, or be bimodal.',tip:'The only measure valid for nominal/categorical data.'},
+  {id:'d4',t:'descriptive',e:'📉',q:'When should you use the median instead of the mean?',hint:'Outliers & skew',a:'When data is skewed or has outliers. E.g. house prices, incomes, exam scores with extreme values.',tip:"Example: 9 people earn £30k, 1 CEO earns £500k. Mean = £77k but median = £30k. Median tells the real story!"},
+  {id:'d5',t:'descriptive',e:'📈',q:'In positively skewed data, how do mean, median and mode compare?',hint:'Tail on the right',a:'Mean > Median > Mode. The mean gets pulled toward the long right tail.',tip:"Positive skew = tail on the right = mean dragged to the right."},
+  {id:'d6',t:'descriptive',e:'🔢',q:'How do you find the median for an even number of values?',hint:'Two middle values',a:'Sort the data, then average the two middle values. E.g. {3,5,7,9} → median = (5+7)/2 = 6',tip:'Always sort the data first!'},
+  {id:'d7',t:'descriptive',e:'📊',q:'In a perfectly symmetric distribution, what is true about mean, median and mode?',hint:'Bell shape...',a:'They are all equal. Mean = Median = Mode.',tip:'This is a key property of the normal distribution.'},
+  {id:'d8',t:'descriptive',e:'🎯',q:'What type of data is the mode best suited for?',hint:'Categories...',a:'Categorical/nominal data where you cannot calculate an average. E.g. most popular shoe colour, most common blood type.',tip:'You can find the mode for any data type, but it is the ONLY valid measure for nominal data.'},
+  {id:'d9',t:'descriptive',e:'⚖️',q:'What is the effect of an outlier on the mean?',hint:'One extreme value...',a:'An outlier pulls the mean toward it, making it unrepresentative of the typical value.',tip:'A single billionaire in a room raises the mean wealth dramatically but the median stays similar.'},
+  {id:'d10',t:'descriptive',e:'📊',q:'What is a trimmed mean?',hint:'Remove extremes first',a:'Calculate the mean after removing a percentage of the highest and lowest values. Reduces the effect of outliers.',tip:'Used in judged sports (like gymnastics) — drop the highest and lowest scores.'},
+  {id:'s1',t:'spread',e:'📏',q:'What is the range?',hint:'Max minus min',a:'Range = Maximum − Minimum. The simplest measure of spread.',tip:'A single outlier can make the range very misleading.'},
+  {id:'s2',t:'spread',e:'📦',q:'What is the IQR?',hint:'Middle 50%',a:'IQR = Q3 − Q1. The range of the middle 50% of data. Resistant to outliers.',tip:'Use IQR when reporting spread alongside the median.'},
+  {id:'s3',t:'spread',e:'📐',q:'What does a large standard deviation tell you?',hint:'Spread...',a:'The data is widely spread out from the mean. Values vary a lot.',tip:'Compare SD relative to the mean — what is "large" depends on context.'},
+  {id:'s4',t:'spread',e:'🔢',q:'Why do we divide by n−1 (not n) for sample standard deviation?',hint:"Bessel's correction",a:"Dividing by n underestimates the true population spread. n−1 corrects this bias for sample data.",tip:'n−1 = degrees of freedom. For large samples the difference is tiny.'},
+  {id:'s5',t:'spread',e:'📊',q:'What is variance?',hint:'Squared deviations',a:'The average of squared differences from the mean: σ² = Σ(x−μ)² / N. Units are squared.',tip:'Standard deviation = √variance. Both measure the same thing but SD is in original units.'},
+  {id:'s6',t:'spread',e:'🔄',q:'What is the relationship between variance and standard deviation?',hint:'Square root...',a:'Standard deviation = √variance. Or Variance = SD². They measure the same spread differently.',tip:'Always state which you are reporting — they have different units!'},
+  {id:'s7',t:'spread',e:'📉',q:'What does a standard deviation of 0 mean?',hint:'No variation...',a:'All values are identical — there is no spread at all in the data.',tip:'Example: {5, 5, 5, 5} has a mean of 5 and SD of 0.'},
+  {id:'s8',t:'spread',e:'📊',q:'Which is more resistant to outliers: the range or the IQR?',hint:'Middle 50% vs extremes',a:'The IQR is much more resistant because it only uses the middle 50% of data and ignores extreme values.',tip:'The range uses only the two most extreme values, making it very sensitive to outliers.'},
+  {id:'dt1',t:'data-types',e:'🗂️',q:'What is the difference between discrete and continuous data?',hint:'Countable vs measurable',a:'Discrete: countable, specific values only (e.g. number of goals). Continuous: any value in a range (e.g. height, weight).',tip:'Can it be a fraction? Yes = continuous. No = discrete.'},
+  {id:'dt2',t:'data-types',e:'🔡',q:'What are the four levels of measurement in order?',hint:'NOIR',a:'Nominal → Ordinal → Interval → Ratio (NOIR). Each level has more mathematical properties than the last.',tip:"Mnemonic: NOIR (French for 'black'). Each level allows more statistical operations."},
+  {id:'dt3',t:'data-types',e:'🏷️',q:'What is nominal data?',hint:'Names only, no order',a:'Categories with no meaningful order. Examples: blood type, country, favourite colour. Only mode is valid.',tip:'Nominal = named. You cannot say one category is "more" than another.'},
+  {id:'dt4',t:'data-types',e:'🥇',q:'What is ordinal data?',hint:'Ordered but unequal gaps',a:'Ordered categories but unequal intervals between them. Example: 1–5 star ratings, finishing positions in a race.',tip:'You know the order, but not HOW MUCH better one rank is than another.'},
+  {id:'dt5',t:'data-types',e:'🌡️',q:'What distinguishes ratio from interval data?',hint:'True zero',a:'Ratio has a true zero (no value below zero). Interval does not. Temperature in °C = interval; height in cm = ratio.',tip:"With ratio data you can say '3 times as much'. With interval you cannot."},
+  {id:'dt6',t:'data-types',e:'📊',q:'What type of chart is used for continuous data?',hint:'Bars touch...',a:'A histogram. The bars touch each other because the data is continuous with no gaps.',tip:'For discrete/nominal data, use a bar chart where bars do NOT touch.'},
+  {id:'p1',t:'probability',e:'🎲',q:'What is the probability of an impossible event?',hint:'Never happens',a:'P = 0. Impossible events can never occur.',tip:'Probabilities always range from 0 to 1 inclusive.'},
+  {id:'p2',t:'probability',e:'🔄',q:'What is the complement rule?',hint:'NOT happening',a:"P(not A) = 1 − P(A). The probability of an event not happening.",tip:'Always check: P(A) + P(not A) must equal 1.'},
+  {id:'p3',t:'probability',e:'➕',q:'What is the addition rule for probability?',hint:'A or B',a:'P(A or B) = P(A) + P(B) − P(A and B). Subtract the overlap to avoid double-counting.',tip:"If events are mutually exclusive (can't both happen), P(A and B) = 0, so just add them."},
+  {id:'p4',t:'probability',e:'🔗',q:'What is conditional probability?',hint:'Given that...',a:'P(A|B) = P(A and B) ÷ P(B). Probability of A given that B has already occurred.',tip:"The bar | means 'given that'. P(rain | cloudy) = probability of rain, given it's cloudy."},
+  {id:'p5',t:'probability',e:'🪙',q:'What makes two events independent?',hint:'One does not affect the other',a:'Events are independent if the outcome of one does not affect the probability of the other. P(A and B) = P(A) × P(B).',tip:"Example: two coin flips are independent. Getting heads on flip 1 doesn't change flip 2."},
+  {id:'p6',t:'probability',e:'🚫',q:'What are mutually exclusive events?',hint:'Cannot both happen',a:'Events that cannot occur at the same time. If A and B are mutually exclusive, P(A and B) = 0.',tip:"Example: rolling a 3 AND a 5 on one die is impossible — they're mutually exclusive."},
+  {id:'p7',t:'probability',e:'📐',q:'What does P(A ∩ B) mean?',hint:'Intersection',a:'The probability that BOTH A and B occur simultaneously. The intersection of events A and B.',tip:'∩ = intersection = AND. Think of a Venn diagram overlap.'},
+  {id:'p8',t:'probability',e:'🌐',q:'What is the sample space?',hint:'All possible outcomes',a:'The set of ALL possible outcomes of a probability experiment, written as S.',tip:"For a coin: S = {H, T}. For a die: S = {1,2,3,4,5,6}."},
+  {id:'di1',t:'distributions',e:'🔔',q:'What is the empirical rule (68-95-99.7 rule)?',hint:'Normal distribution',a:'For a normal distribution: 68% of data within 1 SD, 95% within 2 SDs, 99.7% within 3 SDs of the mean.',tip:'Memorise this! It is used constantly in statistics.'},
+  {id:'di2',t:'distributions',e:'📐',q:'What is a z-score?',hint:'Standard deviations from mean',a:'z = (x − μ) ÷ σ. The number of standard deviations a value is above or below the mean.',tip:"z = +2 means 2 SDs above the mean. z = −1 means 1 SD below."},
+  {id:'di3',t:'distributions',e:'🔔',q:'What are the properties of a normal distribution?',hint:'Bell-shaped...',a:'Symmetric, bell-shaped curve. Mean = Median = Mode. Tails extend to infinity. Defined by μ and σ.',tip:'Many real phenomena are approximately normally distributed: heights, test scores, measurement errors.'},
+  {id:'di4',t:'distributions',e:'📊',q:'What is positive skew?',hint:'Tail on the right',a:'Distribution with a long right tail. Mean > Median > Mode. Income data is typically positively skewed.',tip:"Think: the tail points in the POSITIVE direction (right). The mean chases the tail."},
+  {id:'di5',t:'distributions',e:'🪙',q:'What conditions are needed for a binomial distribution?',hint:'FIST',a:'Fixed n trials; Independent trials; Same probability p each trial; Two outcomes only (success/fail).',tip:"Mnemonic: FIST — Fixed, Independent, Same p, Two outcomes."},
+  {id:'di6',t:'distributions',e:'📈',q:'What is the mean of a binomial distribution?',hint:'n times p',a:'μ = np. The expected number of successes in n trials.',tip:"Example: flip a coin 20 times (n=20, p=0.5). Expected heads = 20 × 0.5 = 10."},
+  {id:'di7',t:'distributions',e:'📊',q:'What is the standard normal distribution?',hint:'Z ~ N(0,1)',a:'A normal distribution with mean = 0 and SD = 1. Any normal distribution can be converted to this using z-scores.',tip:"Used with z-tables to find probabilities. Converting to standard normal removes units."},
+  {id:'di8',t:'distributions',e:'🎰',q:'What is the Poisson distribution used for?',hint:'Rare events over time',a:'Models the number of events occurring in a fixed time/space when events are rare and independent.',tip:"Examples: number of phone calls per hour, number of accidents per day, typos per page."},
+  {id:'h1',t:'hypothesis',e:'🔬',q:'What is the null hypothesis (H₀)?',hint:'Default assumption',a:'The null hypothesis states there is NO effect, no difference, no relationship. It is the default position we test against.',tip:"We test whether data gives enough evidence to REJECT H₀. We never 'accept' it."},
+  {id:'h2',t:'hypothesis',e:'📊',q:'What is a p-value?',hint:'Probability of results this extreme',a:'The probability of observing results as extreme as ours, ASSUMING H₀ is true. Smaller p = stronger evidence against H₀.',tip:"p < 0.05: reject H₀. p ≥ 0.05: fail to reject H₀."},
+  {id:'h3',t:'hypothesis',e:'❌',q:'What is a Type I error?',hint:'False positive',a:"Rejecting H₀ when it is actually true. A 'false positive'. Probability = significance level α.",tip:"Example: Concluding a drug works when it doesn't. Controlled by choosing α."},
+  {id:'h4',t:'hypothesis',e:'❌',q:'What is a Type II error?',hint:'False negative',a:"Failing to reject H₀ when it is actually false. A 'false negative'. Probability = β.",tip:"Example: Missing a real drug effect. Reduced by increasing sample size."},
+  {id:'h5',t:'hypothesis',e:'🎯',q:'What is the significance level α?',hint:'Threshold for rejection',a:'The probability threshold for rejecting H₀. Commonly 0.05 (5%). If p < α, reject H₀.',tip:"α = 0.05 means we accept a 5% risk of making a Type I error."},
+  {id:'h6',t:'hypothesis',e:'↔️',q:'What is a two-tailed vs one-tailed test?',hint:'Direction of effect',a:"One-tailed: tests for effect in ONE direction (e.g. mean > 50). Two-tailed: tests for any difference (mean ≠ 50). Two-tailed is more conservative.",tip:"Use one-tailed only when you have strong prior reason to expect a specific direction."},
+  {id:'h7',t:'hypothesis',e:'⚖️',q:'What does "fail to reject H₀" mean?',hint:'Not proven false...',a:"Insufficient evidence to reject H₀. Does NOT mean H₀ is true — only that we couldn't disprove it with this data.",tip:"Like a 'not guilty' verdict in court — not proof of innocence!"},
+  {id:'h8',t:'hypothesis',e:'💪',q:'What is statistical power?',hint:'Detecting real effects',a:'Power = 1 − β. The probability of correctly rejecting a false H₀. Increased by larger sample size.',tip:"Low power → may miss real effects. Aim for power ≥ 0.80 (80%) in study design."},
+  {id:'c1',t:'correlation',e:'📉',q:"What does Pearson's r measure?",hint:'Linear relationship',a:'Strength and direction of linear relationship between two variables. Range: −1 to +1.',tip:"r = +0.9 is strong positive. r = −0.8 is strong negative. r = 0 means no LINEAR relationship."},
+  {id:'c2',t:'correlation',e:'🚫',q:'Does correlation imply causation?',hint:'Ice cream and drowning...',a:'NO. Correlation shows association, not cause. A lurking third variable may cause both.',tip:"Ice cream sales and drowning rates correlate — but hot weather causes both! Always look for confounders."},
+  {id:'c3',t:'correlation',e:'📊',q:'What is R² in regression?',hint:'Variance explained',a:'R² = r². The proportion of variance in y explained by x. R² = 0.81 means x explains 81% of variation in y.',tip:"R² ranges from 0 (no fit) to 1 (perfect fit). Always between 0% and 100%."},
+  {id:'c4',t:'correlation',e:'📈',q:'What does the slope b represent in ŷ = a + bx?',hint:'Rate of change',a:'For every 1-unit increase in x, y changes by b units on average.',tip:'Positive slope = as x increases, y increases. Negative slope = as x increases, y decreases.'},
+  {id:'c5',t:'correlation',e:'📐',q:'What are residuals in regression?',hint:'Prediction errors',a:'Residual = actual y − predicted ŷ. How far each data point is from the regression line.',tip:"A good model has small, random residuals with no pattern."},
+  {id:'c6',t:'correlation',e:'🏆',q:'When is Spearman correlation used instead of Pearson?',hint:'Ranks and non-normal',a:"When data is ordinal, not normally distributed, or the relationship is monotonic but not linear.",tip:"Spearman's uses ranks instead of raw values. More robust for non-normal data."},
+  {id:'ci1',t:'confidence',e:'🎯',q:'What is a 95% confidence interval?',hint:'Repeated sampling',a:"If we repeated the study 100 times, about 95 of our CIs would contain the true population mean.",tip:"The true mean either IS or ISN'T in any specific interval. The 95% refers to the method, not the interval."},
+  {id:'ci2',t:'confidence',e:'📐',q:'What is the formula for a 95% CI for a mean?',hint:'Mean ± margin of error',a:'CI = x̄ ± 1.96 × (s ÷ √n)',tip:'1.96 comes from the standard normal distribution at 95% confidence.'},
+  {id:'ci3',t:'confidence',e:'📉',q:'How does sample size affect CI width?',hint:'More data = ...',a:'Larger n → smaller SE → narrower CI → more precise estimate of the population mean.',tip:"To halve the CI width, you need to QUADRUPLE the sample size (because of the √n)."},
+  {id:'ci4',t:'confidence',e:'📏',q:'What is standard error (SE)?',hint:'Uncertainty in the mean',a:'SE = s ÷ √n. How much the sample mean is expected to vary from the true population mean.',tip:'SE decreases as sample size increases. Bigger study = more precise estimate.'},
+  {id:'ci5',t:'confidence',e:'🎯',q:'What is the margin of error?',hint:'Half the CI width',a:"Margin of error = z* × SE. Half the total width of the confidence interval.",tip:'Smaller margin of error = more precise estimate. Achieved by increasing sample size.'},
+  {id:'ci6',t:'confidence',e:'⚠️',q:'Common misconception: "95% CI means there is a 95% probability the true mean is inside it." Is this correct?',hint:'Think carefully...',a:"NO. The true mean is fixed — it either is or isn't in the interval. 95% refers to the long-run procedure, not this specific interval.",tip:"This is one of the most commonly misunderstood concepts in statistics. The CI is about the METHOD, not a single result."},
+];
+
+let cards=[...allCards],idx=0,flipped=false,got=0,wrong=0,done=0,curTopic='all';
+function filterCards(t,btn){
+  curTopic=t;
+  document.querySelectorAll('#screen-flashcards .filter-btn').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  cards=t==='all'?[...allCards]:allCards.filter(c=>c.t===t);
+  cards.sort(()=>Math.random()-0.5);
+  idx=0;got=0;wrong=0;done=0;
+  updateScores();showCard();
+}
+function updateScores(){
+  const pct=done===0?0:Math.round(got/done*100);
+  const el=id=>document.getElementById(id);
+  if(el('score-correct'))el('score-correct').textContent=got;
+  if(el('score-wrong'))el('score-wrong').textContent=wrong;
+  if(el('score-remaining'))el('score-remaining').textContent=cards.length-done;
+  if(el('score-pct')){el('score-pct').textContent=pct+'%';el('score-pct').style.color=pct>=70?'#2e7d32':pct>=40?'#e65100':'#ba1a1a';}
+  if(el('card-counter'))el('card-counter').textContent=(idx+1)+'/'+cards.length;
+  const pbar=el('flash-progress');if(pbar)pbar.style.width=(idx/cards.length*100)+'%';
+}
+function showCard(){
+  if(!cards.length)return;
+  const c=cards[idx];
+  const el=id=>document.getElementById(id);
+  if(el('card-emoji'))el('card-emoji').textContent=c.e;
+  if(el('card-question'))el('card-question').textContent=c.q;
+  if(el('card-hint'))el('card-hint').textContent=c.hint;
+  if(el('card-answer'))el('card-answer').textContent=c.a;
+  if(el('card-tip'))el('card-tip').textContent='💡 '+c.tip;
+  if(el('card-cat'))el('card-cat').textContent=c.t.toUpperCase();
+  if(el('card-counter'))el('card-counter').textContent=(idx+1)+'/'+cards.length;
+  const pbar=el('flash-progress');if(pbar)pbar.style.width=((idx+1)/cards.length*100)+'%';
+  flipped=false;
+  const scene=el('flashcard-scene');if(scene)scene.classList.remove('flipped');
+}
+function flipCard(){
+  flipped=!flipped;
+  const scene=document.getElementById('flashcard-scene');
+  if(scene)scene.classList.toggle('flipped',flipped);
+}
+function nextCard(g){
+  done++;
+  if(g)got++;else wrong++;
+  updateScores();
+  idx=(idx+1)%cards.length;
+  flipped=false;
+  setTimeout(showCard,50);
+}
+
+// ══════════ PRACTICE PROBLEMS ══════════
+const problems=[
+  {level:'beginner',topic:'Mean',title:'Calculating the Mean',q:'A student scores 72, 85, 90, 68, and 95 on five tests. What is their mean score?',steps:['Add all scores: 72 + 85 + 90 + 68 + 95 = 410','Divide by the count: 410 ÷ 5 = 82'],answer:'Mean = 82'},
+  {level:'beginner',topic:'Median',title:'Finding the Median',q:'Find the median of: {15, 3, 22, 8, 19, 11, 7}',steps:['Sort in order: {3, 7, 8, 11, 15, 19, 22}','There are 7 values. The middle (4th) value is 11.'],answer:'Median = 11'},
+  {level:'beginner',topic:'Mean vs Median',title:'Which Measure is Better?',q:'A company has 9 employees earning Rs.30,000 and 1 CEO earning Rs.500,000. Find the mean and median. Which better represents a typical employee?',steps:['Mean: (9×30,000 + 500,000) ÷ 10 = 770,000 ÷ 10 = Rs.77,000','Median: Sort all 10 values. Middle = average of 5th and 6th = (30,000+30,000)÷2 = Rs.30,000','The CEO is a huge outlier that inflates the mean.'],answer:'Mean = Rs.77,000 | Median = Rs.30,000 | Median better represents the typical employee.'},
+  {level:'beginner',topic:'Mode',title:'Finding the Mode',q:'Find the mode of: {4, 7, 2, 9, 4, 1, 7, 4, 3}',steps:['Count each value: 1→1, 2→1, 3→1, 4→3, 7→2, 9→1','4 appears most often (3 times)'],answer:'Mode = 4'},
+  {level:'beginner',topic:'Range',title:'Calculating the Range',q:'Daily temperatures this week: 28, 31, 25, 33, 27°C. What is the range?',steps:['Maximum = 33°C, Minimum = 25°C','Range = 33 − 25 = 8°C'],answer:'Range = 8°C'},
+  {level:'beginner',topic:'Probability',title:'Basic Probability',q:'A bag has 3 red, 5 blue and 2 green marbles. What is P(picking blue)?',steps:['Total marbles = 3 + 5 + 2 = 10','P(blue) = 5 ÷ 10'],answer:'P(blue) = 5/10 = 0.5 = 50%'},
+  {level:'beginner',topic:'Probability',title:'Complement Rule',q:'P(rain tomorrow) = 0.35. What is P(no rain)?',steps:['P(no rain) = 1 − P(rain)','= 1 − 0.35'],answer:'P(no rain) = 0.65 = 65%'},
+  {level:'beginner',topic:'Data Types',title:'Classifying Data',q:'Classify each: (a) Number of pets owned, (b) Temperature in °C, (c) Hair colour, (d) Movie ratings 1–5 stars',steps:['(a) Number of pets: discrete quantitative (countable, whole numbers)','(b) Temperature: continuous quantitative (any value on a scale)','(c) Hair colour: nominal qualitative (categories, no order)','(d) Star ratings: ordinal qualitative (ordered, but gaps are unequal)'],answer:'(a) Discrete  (b) Continuous  (c) Nominal  (d) Ordinal'},
+  {level:'beginner',topic:'Probability',title:'Tree Diagram',q:'You flip a coin twice. Find P(two heads) and P(exactly one head).',steps:['Outcomes: HH, HT, TH, TT — each with probability 0.25','P(HH) = 0.5 × 0.5 = 0.25','P(exactly one head) = P(HT) + P(TH) = 0.25 + 0.25 = 0.50'],answer:'P(two heads) = 0.25 | P(exactly one head) = 0.50'},
+  {level:'intermediate',topic:'Standard Deviation',title:'Calculating Sample SD',q:'Calculate the sample standard deviation of: {4, 7, 13, 2, 1}',steps:['Mean = (4+7+13+2+1) ÷ 5 = 27 ÷ 5 = 5.4','Deviations: −1.4, +1.6, +7.6, −3.4, −4.4','Squared: 1.96, 2.56, 57.76, 11.56, 19.36','Sum = 93.2 | Divide by n−1 = 4 → Variance = 23.3','SD = √23.3 ≈ 4.83'],answer:'Sample SD ≈ 4.83'},
+  {level:'intermediate',topic:'Conditional Probability',title:'Conditional Probability',q:'60% of students study maths, 40% study physics, 25% study both. Given a student studies maths, what is P(they also study physics)?',steps:['P(Physics | Maths) = P(Maths AND Physics) ÷ P(Maths)','= 0.25 ÷ 0.60'],answer:'P(Physics | Maths) ≈ 0.417 = 41.7%'},
+  {level:'intermediate',topic:'Z-Score',title:'Z-Score Calculation',q:'Heights are normally distributed: mean = 170cm, SD = 8cm. A person is 186cm tall. What is their z-score? What % of people are shorter?',steps:['z = (186 − 170) ÷ 8 = 16 ÷ 8 = 2.0','z = 2.0 means 186cm is 2 SDs above the mean.','From the 68-95-99.7 rule: 95% within 2 SDs → 97.5% are shorter'],answer:'z = 2.0 | Approximately 97.5% of people are shorter.'},
+  {level:'intermediate',topic:'Correlation',title:'Interpreting Correlation',q:"A researcher finds r = −0.82 between sleep hours and work errors. Interpret this. Does poor sleep cause errors?",steps:['r = −0.82 → strong negative linear correlation','As sleep hours increase, errors decrease (and vice versa)','This is a strong association — but correlation ≠ causation!','Other factors (stress, caffeine, workload) may also affect errors.'],answer:"Strong negative correlation. Sleep and errors are strongly inversely related, but causation cannot be concluded from correlation alone."},
+  {level:'advanced',topic:'Hypothesis Testing',title:'One-Sample t-test',q:'A chocolate bar should weigh 50g. A sample of 36 bars has mean 48.5g, SD = 4.2g. Test at α = 0.05 whether bars are underweight.',steps:['H₀: μ = 50g | H₁: μ < 50g (one-tailed)','SE = 4.2 ÷ √36 = 4.2 ÷ 6 = 0.7','t = (48.5 − 50) ÷ 0.7 = −1.5 ÷ 0.7 ≈ −2.14','Critical value at α=0.05, df=35, one-tailed ≈ −1.69','−2.14 < −1.69 → in the rejection region'],answer:'t ≈ −2.14. Reject H₀. Significant evidence at α = 0.05 that bars are underweight.'},
+  {level:'advanced',topic:'Confidence Intervals',title:'Building a 95% CI',q:'A sample of 100 students has mean exam score 72 with SD = 15. Construct a 95% confidence interval for the population mean.',steps:['SE = 15 ÷ √100 = 15 ÷ 10 = 1.5','For 95% CI: z* = 1.96','Margin of error = 1.96 × 1.5 = 2.94','CI = 72 ± 2.94'],answer:'95% CI: (69.06, 74.94). We are 95% confident the true population mean is between 69.06 and 74.94.'},
+];
+
+let activeLevel='all';
+function filterProbs(lv,btn){
+  activeLevel=lv;
+  document.querySelectorAll('#screen-practice .filter-btn').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  renderProbs();
+}
+function renderProbs(){
+  const c=document.getElementById('probs-container');
+  if(!c)return;
+  let list=activeLevel==='all'?problems:problems.filter(p=>p.level===activeLevel);
+  c.innerHTML=list.map((p,i)=>`
+    <div class="prob-card">
+      <span class="prob-card .lvl lvl-${p.level[0]}">${p.level==='beginner'?'🟢':'p.level==="intermediate"?🟡:🔴'} ${p.level.charAt(0).toUpperCase()+p.level.slice(1)}</span>
+      <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--outline);margin-left:8px">${p.topic}</span>
+      <h3 style="font-size:16px;font-weight:700;margin:8px 0">${p.title}</h3>
+      <div class="prob-q">${p.q}</div>
+      <button class="sol-toggle" onclick="toggleSol(${i})">
+        <span class="material-symbols-outlined" style="font-size:18px">visibility</span> Show Worked Solution
+      </button>
+      <div class="sol-box" id="sol-${i}">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--primary);margin-bottom:10px">Worked Solution</div>
+        ${p.steps.map((s,j)=>`<p style="font-size:13px;color:var(--on-surface-variant);line-height:1.7;margin-bottom:6px"><strong>Step ${j+1}:</strong> ${s}</p>`).join('')}
+        <div class="sol-answer">${p.answer}</div>
+      </div>
+    </div>`).join('');
+}
+function toggleSol(i){
+  const b=document.getElementById('sol-'+i);
+  if(b)b.classList.toggle('open');
+}
+
+// ══════════ GLOSSARY ══════════
+const terms=[
+  {term:'Alternative Hypothesis (H₁)',def:'The hypothesis that contradicts H₀. States there IS an effect or difference. What the researcher usually wants to prove.',tag:'Inference'},
+  {term:'Average',def:'A general word for a measure of central tendency. Usually refers to the mean (sum ÷ count).',tag:'Descriptive'},
+  {term:'Bell Curve',def:'The common name for the shape of a normal distribution — symmetric and bell-shaped, with most values near the middle.',tag:'Distributions'},
+  {term:'Bias',def:'A systematic error that causes results to consistently lean in one direction. Makes estimates inaccurate.',tag:'General'},
+  {term:'Binomial Distribution',def:'Models the number of successes in n independent trials, each with probability p. Written X ~ B(n, p).',tag:'Distributions'},
+  {term:'Central Tendency',def:'A single value that represents the "centre" or "typical" value of a dataset. Mean, median and mode are the three main measures.',tag:'Descriptive'},
+  {term:'Confidence Interval (CI)',def:'A range of values likely to contain the true population parameter. A 95% CI means the method captures the true value 95% of the time.',tag:'Inference'},
+  {term:'Confounding Variable',def:'A hidden third variable that influences both variables being studied, potentially creating a misleading association.',tag:'General'},
+  {term:'Continuous Data',def:'Numerical data that can take any value in a range. Examples: height, weight, temperature. Measured, not counted.',tag:'Data Types'},
+  {term:'Correlation',def:'A statistical relationship between two variables. Measured by r, ranging from −1 to +1.',tag:'Inference'},
+  {term:'Data',def:'Individual pieces of information collected for analysis. Can be numbers (quantitative) or categories (qualitative).',tag:'General'},
+  {term:'Degrees of Freedom (df)',def:'The number of independent values free to vary when estimating a statistic. For sample variance, df = n − 1.',tag:'Inference'},
+  {term:'Discrete Data',def:'Numerical data that takes only specific countable values. Examples: number of goals, number of siblings. Counted, not measured.',tag:'Data Types'},
+  {term:'Distribution',def:'A description of how data values are spread, or how probabilities are assigned to outcomes.',tag:'Distributions'},
+  {term:'Empirical Rule',def:'For a normal distribution: 68% within 1 SD, 95% within 2 SDs, 99.7% within 3 SDs of the mean.',tag:'Distributions'},
+  {term:'Frequency',def:'How often a value occurs. Absolute frequency = count. Relative frequency = proportion of total.',tag:'Descriptive'},
+  {term:'Histogram',def:'A graph for continuous data. Bars touch each other because data is continuous. Height = frequency.',tag:'Descriptive'},
+  {term:'Hypothesis',def:'A testable statement about a population. In statistics we test H₀ (null) against H₁ (alternative).',tag:'Inference'},
+  {term:'Independent Events',def:'Two events where the outcome of one does not affect the other. P(A and B) = P(A) × P(B).',tag:'Probability'},
+  {term:'Inferential Statistics',def:'Using sample data to draw conclusions about a larger population. Includes hypothesis testing and confidence intervals.',tag:'Inference'},
+  {term:'Interquartile Range (IQR)',def:'Q3 − Q1. The spread of the middle 50% of data. Resistant to outliers.',tag:'Descriptive'},
+  {term:'Mean (x̄)',def:'The arithmetic average. Sum all values, divide by count. Sensitive to outliers.',tag:'Descriptive'},
+  {term:'Median',def:'The middle value of sorted data. Not affected by outliers. Better for skewed data.',tag:'Descriptive'},
+  {term:'Mode',def:'The most frequently occurring value. The only measure valid for nominal (categorical) data.',tag:'Descriptive'},
+  {term:'Mutually Exclusive Events',def:'Events that cannot occur at the same time. P(A and B) = 0.',tag:'Probability'},
+  {term:'Normal Distribution',def:'A symmetric, bell-shaped distribution defined by mean μ and SD σ. Many natural phenomena follow this shape.',tag:'Distributions'},
+  {term:'Null Hypothesis (H₀)',def:'The default assumption of no effect, no difference, no relationship. What we try to disprove.',tag:'Inference'},
+  {term:'Ordinal Data',def:'Categorical data with a meaningful order but unequal intervals. Examples: rankings, star ratings.',tag:'Data Types'},
+  {term:'Outlier',def:'A value unusually far from the rest. Can heavily influence the mean and standard deviation.',tag:'Descriptive'},
+  {term:'p-value',def:'Probability of seeing results as extreme as ours, if H₀ is true. p < 0.05 → reject H₀.',tag:'Inference'},
+  {term:'Parameter',def:'A value describing a whole population (e.g. true population mean μ). Usually estimated from samples.',tag:'General'},
+  {term:'Population',def:'The entire group being studied. We usually cannot measure everyone, so we use samples.',tag:'General'},
+  {term:'Probability',def:'How likely an event is, from 0 (impossible) to 1 (certain).',tag:'Probability'},
+  {term:'Qualitative Data',def:'Data described by categories, not numbers. Examples: colour, blood type, nationality.',tag:'Data Types'},
+  {term:'Quantitative Data',def:'Numerical data that can be measured or counted. Divided into discrete and continuous.',tag:'Data Types'},
+  {term:'Quartiles',def:'Values dividing sorted data into four equal parts. Q1=25th percentile, Q2=median, Q3=75th percentile.',tag:'Descriptive'},
+  {term:'Range',def:'Maximum − Minimum. Simplest measure of spread, but very sensitive to outliers.',tag:'Descriptive'},
+  {term:'Regression',def:'Finding the best-fit line through data: ŷ = a + bx. Used to predict one variable from another.',tag:'Inference'},
+  {term:'Residual',def:'Actual y − Predicted ŷ. The prediction error of a regression model.',tag:'Inference'},
+  {term:'Sample',def:'A subset of a population selected for study. Used to estimate population parameters.',tag:'General'},
+  {term:'Significance Level (α)',def:'The p-value threshold for rejecting H₀. Usually 0.05 (5%). If p < α, reject H₀.',tag:'Inference'},
+  {term:'Skewness',def:'Asymmetry in a distribution. Positive skew = long right tail (mean > median). Negative = long left tail.',tag:'Distributions'},
+  {term:'Standard Deviation (SD)',def:'√variance. Average distance of each data point from the mean. In the same units as the data.',tag:'Descriptive'},
+  {term:'Standard Error (SE)',def:'s ÷ √n. How much the sample mean is expected to vary from the true population mean.',tag:'Inference'},
+  {term:'Type I Error',def:"Rejecting a true H₀ — a 'false positive'. Probability = α.",tag:'Inference'},
+  {term:'Type II Error',def:"Failing to reject a false H₀ — a 'false negative'. Probability = β.",tag:'Inference'},
+  {term:'Variance',def:'Average of squared deviations from the mean. σ² for population, s² for sample (uses n−1).',tag:'Descriptive'},
+  {term:'Z-score',def:'(x − μ) ÷ σ. Number of standard deviations a value is from the mean. Used to standardise data.',tag:'Distributions'},
+];
+const tagCol={Descriptive:'rgba(61,90,153,0.1)',Distributions:'rgba(30,107,140,0.12)',Inference:'rgba(92,77,158,0.12)',Probability:'rgba(46,125,50,0.1)','Data Types':'rgba(153,120,61,0.1)',General:'rgba(100,100,100,0.1)'};
+const tagTxt={Descriptive:'var(--primary)',Distributions:'var(--secondary)',Inference:'var(--tertiary)',Probability:'#2e7d32','Data Types':'#9a7520',General:'var(--outline)'};
+function renderGlossary(){
+  const c=document.getElementById('g-container');if(!c)return;
+  const q=(document.getElementById('g-input')||{value:''}).value.toLowerCase();
+  let list=q?terms.filter(t=>t.term.toLowerCase().includes(q)||t.def.toLowerCase().includes(q)):terms;
+  if(!list.length){c.innerHTML='<p style="color:var(--outline);text-align:center;padding:32px">No terms found.</p>';return;}
+  const grouped={};
+  list.forEach(t=>{const l=t.term[0].toUpperCase();if(!grouped[l])grouped[l]=[];grouped[l].push(t);});
+  c.innerHTML=Object.keys(grouped).sort().map(l=>`
+    <div class="g-letter">${l}</div>
+    ${grouped[l].map(t=>`
+      <div class="g-item">
+        <span class="g-tag" style="background:${tagCol[t.tag]||'rgba(100,100,100,0.1)'};color:${tagTxt[t.tag]||'var(--outline)'}">${t.tag}</span>
+        <h4>${t.term}</h4>
+        <p>${t.def}</p>
+      </div>`).join('')}
+  `).join('');
+}
+
+// Init
+showCard();updateScores();renderProbs();renderGlossary();
+</script>
+</body>
+</html>
