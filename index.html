@@ -757,46 +757,46 @@ const topicData = {
   html:`
     <div class="visual-box">
       <h4>🗺️ The Big Map of Data Types</h4>
-      <svg viewBox="0 0 320 210" style="width:100%">
-        <rect width="320" height="210" fill="#f8faff" rx="12"/>
-        <!-- Root -->
-        <rect x="105" y="10" width="110" height="34" rx="10" fill="#1e6b8c"/>
-        <text x="160" y="32" text-anchor="middle" font-size="14" font-weight="800" fill="white">All Data</text>
-        <!-- Branch lines -->
-        <line x1="160" y1="44" x2="85" y2="72" stroke="#94a3b8" stroke-width="2"/>
-        <line x1="160" y1="44" x2="235" y2="72" stroke="#94a3b8" stroke-width="2"/>
-        <!-- Qualitative -->
-        <rect x="18" y="72" width="134" height="34" rx="10" fill="#fce7f3" stroke="#f9a8d4" stroke-width="1.5"/>
-        <text x="85" y="94" text-anchor="middle" font-size="13" font-weight="800" fill="#9d174d">Qualitative</text>
-        <!-- Quantitative -->
-        <rect x="168" y="72" width="134" height="34" rx="10" fill="#dbeafe" stroke="#93c5fd" stroke-width="1.5"/>
-        <text x="235" y="94" text-anchor="middle" font-size="13" font-weight="800" fill="#1e40af">Quantitative</text>
-        <!-- Sub-branch lines -->
-        <line x1="65" y1="106" x2="50" y2="128" stroke="#94a3b8" stroke-width="1.5"/>
-        <line x1="105" y1="106" x2="118" y2="128" stroke="#94a3b8" stroke-width="1.5"/>
-        <line x1="200" y1="106" x2="188" y2="128" stroke="#94a3b8" stroke-width="1.5"/>
-        <line x1="270" y1="106" x2="278" y2="128" stroke="#94a3b8" stroke-width="1.5"/>
-        <!-- Nominal -->
-        <rect x="10" y="128" width="82" height="30" rx="8" fill="#fce7f3" stroke="#f9a8d4" stroke-width="1.5"/>
-        <text x="51" y="148" text-anchor="middle" font-size="12" font-weight="700" fill="#9d174d">Nominal</text>
-        <!-- Ordinal -->
-        <rect x="96" y="128" width="82" height="30" rx="8" fill="#fce7f3" stroke="#f9a8d4" stroke-width="1.5"/>
-        <text x="137" y="148" text-anchor="middle" font-size="12" font-weight="700" fill="#9d174d">Ordinal</text>
-        <!-- Discrete -->
-        <rect x="152" y="128" width="82" height="30" rx="8" fill="#dbeafe" stroke="#93c5fd" stroke-width="1.5"/>
-        <text x="193" y="148" text-anchor="middle" font-size="12" font-weight="700" fill="#1e40af">Discrete</text>
-        <!-- Continuous -->
-        <rect x="238" y="128" width="72" height="30" rx="8" fill="#dbeafe" stroke="#93c5fd" stroke-width="1.5"/>
-        <text x="274" y="148" text-anchor="middle" font-size="12" font-weight="700" fill="#1e40af">Continuous</text>
-        <!-- Examples -->
-        <text x="51" y="172" text-anchor="middle" font-size="11" fill="#9d174d">blood type</text>
-        <text x="51" y="186" text-anchor="middle" font-size="11" fill="#db2777">eye colour</text>
-        <text x="137" y="172" text-anchor="middle" font-size="11" fill="#9d174d">star ratings</text>
-        <text x="137" y="186" text-anchor="middle" font-size="11" fill="#db2777">rankings</text>
-        <text x="193" y="172" text-anchor="middle" font-size="11" fill="#1e40af">no. of goals</text>
-        <text x="193" y="186" text-anchor="middle" font-size="11" fill="#2563eb">no. of kids</text>
-        <text x="274" y="172" text-anchor="middle" font-size="11" fill="#1e40af">height</text>
-        <text x="274" y="186" text-anchor="middle" font-size="11" fill="#2563eb">temperature</text>
+      <svg viewBox="0 0 320 230" style="width:100%">
+        <rect width="320" height="230" fill="#f8faff" rx="12"/>
+        <!-- Root box — centred -->
+        <rect x="105" y="10" width="110" height="32" rx="10" fill="#1e6b8c"/>
+        <text x="160" y="31" text-anchor="middle" font-size="13" font-weight="800" fill="white">All Data</text>
+        <!-- Branch lines to level 2 -->
+        <line x1="160" y1="42" x2="82" y2="68" stroke="#94a3b8" stroke-width="1.5"/>
+        <line x1="160" y1="42" x2="238" y2="68" stroke="#94a3b8" stroke-width="1.5"/>
+        <!-- Qualitative — left half -->
+        <rect x="16" y="68" width="132" height="30" rx="8" fill="#fce7f3" stroke="#f9a8d4" stroke-width="1.5"/>
+        <text x="82" y="88" text-anchor="middle" font-size="12" font-weight="800" fill="#9d174d">Qualitative</text>
+        <!-- Quantitative — right half -->
+        <rect x="172" y="68" width="132" height="30" rx="8" fill="#dbeafe" stroke="#93c5fd" stroke-width="1.5"/>
+        <text x="238" y="88" text-anchor="middle" font-size="12" font-weight="800" fill="#1e40af">Quantitative</text>
+        <!-- Branch lines to level 3 -->
+        <line x1="55" y1="98" x2="46" y2="122" stroke="#94a3b8" stroke-width="1.5"/>
+        <line x1="109" y1="98" x2="118" y2="122" stroke="#94a3b8" stroke-width="1.5"/>
+        <line x1="205" y1="98" x2="196" y2="122" stroke="#94a3b8" stroke-width="1.5"/>
+        <line x1="271" y1="98" x2="278" y2="122" stroke="#94a3b8" stroke-width="1.5"/>
+        <!-- Nominal — x:8, width:76 -->
+        <rect x="8" y="122" width="76" height="28" rx="7" fill="#fce7f3" stroke="#f9a8d4" stroke-width="1.5"/>
+        <text x="46" y="141" text-anchor="middle" font-size="11" font-weight="700" fill="#9d174d">Nominal</text>
+        <!-- Ordinal — x:88, width:76 — gap of 4px from Nominal -->
+        <rect x="88" y="122" width="76" height="28" rx="7" fill="#fce7f3" stroke="#f9a8d4" stroke-width="1.5"/>
+        <text x="126" y="141" text-anchor="middle" font-size="11" font-weight="700" fill="#9d174d">Ordinal</text>
+        <!-- Discrete — x:168, width:76 — gap of 4px from Ordinal -->
+        <rect x="168" y="122" width="76" height="28" rx="7" fill="#dbeafe" stroke="#93c5fd" stroke-width="1.5"/>
+        <text x="206" y="141" text-anchor="middle" font-size="11" font-weight="700" fill="#1e40af">Discrete</text>
+        <!-- Continuous — x:248, width:64 — gap of 4px from Discrete -->
+        <rect x="248" y="122" width="64" height="28" rx="7" fill="#dbeafe" stroke="#93c5fd" stroke-width="1.5"/>
+        <text x="280" y="141" text-anchor="middle" font-size="11" font-weight="700" fill="#1e40af">Continuous</text>
+        <!-- Examples row -->
+        <text x="46" y="166" text-anchor="middle" font-size="10" fill="#9d174d">blood type</text>
+        <text x="46" y="179" text-anchor="middle" font-size="10" fill="#db2777">eye colour</text>
+        <text x="126" y="166" text-anchor="middle" font-size="10" fill="#9d174d">star ratings</text>
+        <text x="126" y="179" text-anchor="middle" font-size="10" fill="#db2777">rankings</text>
+        <text x="206" y="166" text-anchor="middle" font-size="10" fill="#1e40af">no. of goals</text>
+        <text x="206" y="179" text-anchor="middle" font-size="10" fill="#2563eb">no. of kids</text>
+        <text x="280" y="166" text-anchor="middle" font-size="10" fill="#1e40af">height</text>
+        <text x="280" y="179" text-anchor="middle" font-size="10" fill="#2563eb">temperature</text>
       </svg>
     </div>
     <div class="example-box">
